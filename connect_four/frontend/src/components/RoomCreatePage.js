@@ -7,11 +7,17 @@ export default function RoomCreatePage(props) {
     const [value, setValue] = React.useState(5);
     const handleChange = (event, newValue) => {
         setValue(newValue);
-      };
+    };
+
+    const [buttonValue, setButtonValue] = React.useState("without");
+    const handleButtonChange = (event) => {
+        
+        setButtonValue(event.target.value);
+    }
 
     const useStyles = makeStyles({
         root: {
-          width: 250,
+          width: 200,
           marginTop:10,
         },
       });
@@ -29,14 +35,23 @@ export default function RoomCreatePage(props) {
         fetch("/player/create-room", requestOptions).then((response) => response.json()).then((data) => props.history.push("/player/room/" + data.code));
     }
 
-    const generateSlider = (e) => {
+    
+
+    const generateSlider = () => {
         
-        if(e.target.value === "True"){
-            console.log("true")
-        }
-        else 
-        console.log("false")
+        return (<div className={classes.root}>
+            <Typography id="continuous-slider" gutterBottom>
+                Minutes per Player: <b>{value}</b>
+            </Typography>
+            <Slider 
+                value={value} 
+                onChange={handleChange} 
+                min={1}
+                max={30}/>
+        </div>)
     }
+
+    
 
     return (<Grid container spacing={1} align="center">
         <Grid item xs={12}>
@@ -56,29 +71,20 @@ export default function RoomCreatePage(props) {
                     variant="outlined"
                     required={true}
                 />
-                <RadioGroup row defaultValue="True" onChange={generateSlider}>
-                <FormControlLabel value="True"
+                <RadioGroup row value={buttonValue} onChange={handleButtonChange}>
+                <FormControlLabel value={"with"}
                     control={<Radio color="primary" />}
                     label = "With time"
                     labelPlacement = "bottom" />
-                <FormControlLabel value="False"
+                <FormControlLabel value={"without"}
                     control={<Radio color="secondary" />}
                     label = "Without time"
                     labelPlacement = "bottom" />       
             </RadioGroup>
-            
+            {buttonValue==="with" ? generateSlider() : null}
             
             </FormControl>
-            <div className={classes.root}>
-                <Typography id="continuous-slider" gutterBottom>
-                    Minutes per Player: <b>{value}</b>
-                </Typography>
-                <Slider 
-                    value={value} 
-                    onChange={handleChange} 
-                    min={1}
-                    max={30}/>
-            </div>                  
+                              
         </Grid>
         <Grid item xs={12} >
             <Button color="primary" variant="contained" onClick={handleButtonClick}>Create a Room</Button>

@@ -5,9 +5,9 @@ import RoomJoinPage from "./RoomJoinPage";
 import RoomCreatePage from "./RoomCreatePage"
 
 function App(props) {
-    return (<>
+    return (<div className="center">
     <HomePage />
-    </>);
+    </div>);
 }
 
 render(
