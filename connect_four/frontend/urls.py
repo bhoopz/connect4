@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, register_converter
 from .views import *
 
 urlpatterns = [
@@ -7,4 +7,8 @@ urlpatterns = [
     path('player/create', index),
     path('player/room/<str:roomCode>', index),
     path('player/', index),
+    path('computer/', index),
+    path('computer/<str:level>', index),
+    #path('computer/medium', index),
+    #path('computer/hard', index),
 ]

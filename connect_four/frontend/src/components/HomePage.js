@@ -5,9 +5,9 @@ import RoomCreatePage from "./RoomCreatePage"
 import Room from "./Room"
 import PlayerPage from "./PlayerPage"
 import ComputerPage from "./ComputerPage"
+import GamePage from "./GamePage"
 import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
-import axios from 'axios';
 
 export default function HomePage(props) {
 
@@ -15,16 +15,13 @@ export default function HomePage(props) {
 
     useEffect(() => {
         async function fetchMyAPI() {
-          let response = await fetch('player/room')
+          let response = await fetch('/player/room')
           response = await response.json()
           setData(response)
         }
     
         fetchMyAPI()
       }, [])
-    
-    
-    
     
 
     const generateHomePage = () => {
@@ -33,7 +30,10 @@ export default function HomePage(props) {
             <Typography component="h3" variant="h3">
                 Connect 4
             </Typography>
-            {<div>{JSON.stringify(data.map((room) => {return room}))}</div>}
+            {<div>{JSON.stringify(data)}</div>}
+            {data.map(function(item, i){
+            return <li key={i}>{item.id} - {item.game_time}</li>
+})}
             
         </Grid>      
         <Grid item xs={12}>
@@ -59,7 +59,13 @@ export default function HomePage(props) {
             </Route>
             <Route path="/player" component={PlayerPage}>
             </Route>
-            <Route path="/computer" component={ComputerPage}>
+            <Route exact path="/computer" component={ComputerPage}>
+            </Route>
+            <Route path="/computer/easy" component={GamePage}>
+            </Route>
+            <Route path="/computer/medium" component={GamePage}>
+            </Route>
+            <Route path="/computer/hard" component={GamePage}>
             </Route>
         </Switch>
         </Router>);

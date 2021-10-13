@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { render } from "react-dom";
+import React from "react";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
 import { Link } from "react-router-dom";
 
