@@ -267,12 +267,12 @@ class Game(models.Model):
     @classmethod
     def main(self, column, board):
         game_over = False
-        queue = [1, 2]
+        """ queue = [1, 2]
         player = random.choice(queue)
         queue.remove(player)
-        bot = queue[0]
-        """ player = 2
-        bot = 1 """
+        bot = queue[0] """
+        player = 1
+        bot = 2
         if not game_over:
             if(player < bot):
                 self.player_move(board, player, column)

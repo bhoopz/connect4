@@ -4,10 +4,14 @@ import { Button, Grid, Typography, TextField, FormHelperText, FormControl, Radio
 import Select from 'react-select'
 
 export default function RoomCreatePage(props) {
-    const [value, setValue] = React.useState(5);
+    let [value, setValue] = React.useState(5);
+    const [nick, setNick] = React.useState("Anonymous")
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+    const handleTextFieldChange2 = (e) => {
+        setNick(e.target.value)
+    }
 
     const [buttonValue, setButtonValue] = React.useState("without");
     const handleButtonChange = (event) => {
@@ -25,6 +29,10 @@ export default function RoomCreatePage(props) {
     
 
     const handleButtonClick = () => {
+        
+        if(buttonValue == "without"){
+            value = '00'
+        }
         const requestOptions= {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
@@ -32,7 +40,7 @@ export default function RoomCreatePage(props) {
                 game_time: '00:' + value + ':00',
             })
         };
-        fetch("/player/create-room", requestOptions).then((response) => response.json()).then((data) => props.history.push("/player/room/" + data.code));
+        fetch("/player/create-room", requestOptions).then((response) => response.json()).then((data) => props.history.push({pathname:"/player/room/" + data.code, state:{nick}}));
     }
 
     
@@ -62,7 +70,7 @@ export default function RoomCreatePage(props) {
         <Grid item xs={12} >
             <FormControl component="fieldset">
                 <FormHelperText>
-                    <div align="center">Enter Your Nickname</div>
+                    Enter Your Nickname
                 </FormHelperText>
                 <TextField margin="normal"
                     label="Nickname"
@@ -70,6 +78,7 @@ export default function RoomCreatePage(props) {
                     defaultValue="Anonymous"
                     variant="outlined"
                     required={true}
+                    onChange={handleTextFieldChange2}
                 />
                 <RadioGroup row value={buttonValue} onChange={handleButtonChange}>
                 <FormControlLabel value={"with"}

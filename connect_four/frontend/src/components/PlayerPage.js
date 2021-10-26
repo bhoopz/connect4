@@ -6,7 +6,7 @@ export default function PlayerPage(props){
     return (<Grid container spacing={1} align="center">
     
 <Grid item xs={12}>
-    <Button color="primary" variant="contained" to="/player/create/" component={Link} >CREATE ROOM</Button>
+    <Button color="primary" variant="contained" to="/player/create" component={Link} >CREATE ROOM</Button>
 </Grid>
 <Grid item xs={12}>
     <Button color="secondary" variant="contained" to="/player/join" component={Link}>JOIN ROOM</Button>

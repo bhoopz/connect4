@@ -1,8 +1,8 @@
 from django.test import TestCase
 
 import numpy as np
-import random
 import math
+import random
 
 
 def make_board():
@@ -46,11 +46,13 @@ def winning_conditions(board, x):
                 return True
 
 
-def score_every_node(board, player, bot):
+def score_every_node(board, player, bot, BOT_LEVEL):
     score = 0
 
     for y in range(7):
         for z in range(3):
+            if BOT_LEVEL == 5 and board[z][3] == bot:
+                score += 1
             if(board[z][y] == bot and board[z+1][y] == bot and board[z+2][y] == bot and board[z+3][y] == bot):
                 score += math.inf
             elif(board[z][y] == bot and board[z+1][y] == bot and board[z+2][y] == bot):
@@ -66,6 +68,8 @@ def score_every_node(board, player, bot):
 
     for y in range(4):
         for z in range(6):
+            if BOT_LEVEL == 5 and board[z][3] == bot:
+                score += 1
             if(board[z][y] == bot and board[z][y+1] == bot and board[z][y+2] == bot and board[z][y+3] == bot):
                 score += math.inf
             elif(board[z][y] == bot and board[z][y+1] == bot and board[z][y+2] == bot):
@@ -82,6 +86,8 @@ def score_every_node(board, player, bot):
     # skos w dół
     for y in range(4):
         for z in range(3, 6):
+            if BOT_LEVEL == 5 and board[z][3] == bot:
+                score += 1
             if(board[z][y] == bot and board[z-1][y+1] == bot and board[z-2][y+2] == bot and board[z-3][y+3] == bot):
                 score += math.inf
             elif(board[z][y] == bot and board[z-1][y+1] == bot and board[z-2][y+2] == bot):
@@ -98,6 +104,8 @@ def score_every_node(board, player, bot):
     # skos w góre
     for y in range(4):
         for z in range(3):
+            if BOT_LEVEL == 5 and board[z][3] == bot:
+                score += 1
             if(board[z][y] == bot and board[z+1][y+1] == bot and board[z+2][y+2] == bot and board[z+3][y+3] == bot):
                 score += math.inf
             elif(board[z][y] == bot and board[z+1][y+1] == bot and board[z+2][y+2] == bot):
@@ -132,7 +140,8 @@ def legal_moves(board):
     return possibilities
 
 
-def ai_move(board, player, bot):
+def ai_move(depth):
+    BOT_LEVEL = depth
     best_score = -math.inf
     best_column = 3
     possibilities = legal_moves(board)
@@ -141,8 +150,8 @@ def ai_move(board, player, bot):
         if(correct_row(board, column)):
             row = row_change(board, column)
             board[row][column] = bot
-            score = minimax(
-                board, 3, False, -math.inf, math.inf, player, bot)
+            score = minimax(board, depth, False, -
+                            math.inf, math.inf, BOT_LEVEL)
             print(score, column)
             board[row][column] = 0
             if(score > best_score):
@@ -153,10 +162,10 @@ def ai_move(board, player, bot):
     make_move(board, row, best_column, bot)
 
 
-def minimax(board, depth, maximizing_player, alpha, beta, player, bot):
+def minimax(board, depth, maximizing_player, alpha, beta, BOT_LEVEL):
 
     if(depth == 0):
-        score = score_every_node(board, player, bot)
+        score = score_every_node(board, player, bot, BOT_LEVEL)
         return score
 
     if(maximizing_player):
@@ -167,8 +176,7 @@ def minimax(board, depth, maximizing_player, alpha, beta, player, bot):
             if(correct_row(board, column)):
                 row = row_change(board, column)
                 board[row][column] = bot
-                score = minimax(
-                    board, depth-1, False, alpha, beta, player, bot)
+                score = minimax(board, depth-1, False, alpha, beta, BOT_LEVEL)
                 board[row][column] = 0
                 best_score = max(score, best_score)
                 alpha = max(alpha, best_score)
@@ -184,8 +192,7 @@ def minimax(board, depth, maximizing_player, alpha, beta, player, bot):
             if(correct_row(board, column)):
                 row = row_change(board, column)
                 board[row][column] = player
-                score = minimax(
-                    board, depth-1, True, alpha, beta, player, bot)
+                score = minimax(board, depth-1, True, alpha, beta, BOT_LEVEL)
                 board[row][column] = 0
                 best_score = min(score, best_score)
                 beta = min(beta, best_score)
@@ -194,14 +201,14 @@ def minimax(board, depth, maximizing_player, alpha, beta, player, bot):
         return best_score
 
 
-def player_move(board, player, column):
-
+def player_move():
+    column = int(input())
     if(correct_row(board, column)):
         row = row_change(board, column)
         make_move(board, row, column, player)
 
 
-def check_conditions(board, player, bot):
+def check_conditions():
     if(draw_condition(board)):
         print('DRAW!')
         return True
@@ -213,36 +220,31 @@ def check_conditions(board, player, bot):
         return True
 
 
-board = make_board()
-
-
-def main(column):
+def start_game():
     game_over = False
-
-    """ queue = [1, 2]
-    player = random.choice(queue)
-    queue.remove(player)
-    bot = queue[0] """
-    player = 2
-    bot = 1
-    if not game_over:
+    while not game_over:
         if(player < bot):
-            player_move(board, player, column)
-            if(check_conditions(board, player, bot)):
-                game_over = True
-                return board
-            ai_move(board, player, bot)
-            if(check_conditions(board, player, bot)):
-                game_over = True
-                return board
+            player_move()
+            if(check_conditions()):
+                break
+            ai_move(6)
+            print(np.flipud(board))
+            if(check_conditions()):
+                break
 
         else:
-            ai_move(board, player, bot)
-            if(check_conditions(board, player, bot)):
-                game_over = True
-                return board
-            player_move(board, player, column)
-            if(check_conditions(board, player, bot)):
-                game_over = True
-                return board
-        return board
+            ai_move(6)
+            print(np.flipud(board))
+            if(check_conditions()):
+                break
+            player_move()
+            if(check_conditions()):
+                break
+
+
+board = make_board()
+queue = [1, 2]
+player = random.choice(queue)
+queue.remove(player)
+bot = queue[0]
+start_game()

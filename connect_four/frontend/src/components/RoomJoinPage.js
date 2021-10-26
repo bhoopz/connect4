@@ -1,16 +1,22 @@
 import React from "react";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
 import { Link } from "react-router-dom";
-
+import Room from "./Room";
+import { useParams, useHistory } from "react-router-dom";
 export default function RoomJoinPage(props) {
-
+    let history = useHistory();
     const [roomCode, setRoomCode] = React.useState("");
     const [error, setError] = React.useState("");
+    const [nick, setNick] = React.useState("Anonymous")
     const handleTextFieldChange = (e) => {
         setRoomCode(e.target.value)
     }
+    const handleTextFieldChange2 = (e) => {
+        setNick(e.target.value)
+    }
 
     const handleJoinRoomButtonClick= () => {
+        console.log(nick)
         const requestOptions= {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
@@ -19,15 +25,16 @@ export default function RoomJoinPage(props) {
             })
         };
         fetch("/player/join-room", requestOptions).then((response) => {
+            console.log(response)
             if(response.ok){
-                props.history.push(`/player/room/${roomCode}`)
+                history.push({pathname:`/player/room/${roomCode}`, state:{nick}})
             }else{
                 setError("Room not found :(")
             }
         })
     }
 
-
+    
     return (
     <Grid container spacing={1} align="center">
         <Grid item xs={12}>
@@ -38,7 +45,7 @@ export default function RoomJoinPage(props) {
         <Grid item xs={12} >
             <FormControl component="fieldset">
                 <FormHelperText>
-                    <div align="center">Enter Your Nickname and Room Code</div>
+                    Enter Your Nickname and Room Code
                 </FormHelperText>
                 <TextField margin="normal"
                     label="Nickname"
@@ -47,6 +54,7 @@ export default function RoomJoinPage(props) {
                     variant="outlined"
                     required={true}
                     placeholder="Enter a nickname"
+                    onChange={handleTextFieldChange2}
                 />
                 <TextField margin="normal"
                     label="Room code"
@@ -56,7 +64,7 @@ export default function RoomJoinPage(props) {
                     required={true}
                     placeholder="Enter a room code"
                     onChange={handleTextFieldChange}
-                    error={error}
+                    error={error.length > 0}
                     helperText={error}
                 />
                 </FormControl>
@@ -68,6 +76,7 @@ export default function RoomJoinPage(props) {
             <Button color="secondary" variant="contained" to="/player/" component={Link}>Back</Button>
         </Grid>
 
-
+        
     </Grid>);
+    
 }

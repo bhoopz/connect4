@@ -151,17 +151,13 @@ class GetGame(APIView):
 
         column = int(request.data['column'])
         board = request.data['board']
-        print(board)
         board = Game.string_to_2d_array(board)
-        print(board, column)
         host = self.request.session.session_key
         queryset = Game.objects.filter(host=host)
         game = queryset[0]
         depth = int(game.bot_level)
-        print(depth)
         game.board = Game.main(column, board)
         game.save(update_fields=['board'])
-        print(game.board)
         return Response(GameSerializer(game).data, status=status.HTTP_200_OK)
 
 

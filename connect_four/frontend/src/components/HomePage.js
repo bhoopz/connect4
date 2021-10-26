@@ -22,7 +22,7 @@ export default function HomePage(props) {
     
         fetchMyAPI()
       }, [])
-    
+
 
     const generateHomePage = () => {
         return (<Grid container spacing={1} align="center">

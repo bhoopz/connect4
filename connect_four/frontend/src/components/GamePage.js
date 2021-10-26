@@ -9,7 +9,7 @@ export default function GamePage(props){
     const rows = 6
     const columns = 7
     const [data, setData] = useState([]);
-    const [board, setBoard] = useState([[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]]);
+    var [board, setBoard] = useState([[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0]]);
     let params = useParams()
     
 
@@ -17,10 +17,14 @@ export default function GamePage(props){
         async function fetchMyAPI() {
           let response = await fetch('/computer/get-game')
           response = await response.json()
-          setBoard(JSON.parse(JSON.stringify(response.board)))
-
+          setBoard(response.board)
         }
-
+        gameSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            console.log(data.board);
+            console.log(typeof data.board)
+          };
+        
         fetchMyAPI()
         
       }, [])
@@ -37,7 +41,6 @@ export default function GamePage(props){
 
     const handleButtonClick = (e) => {
         const column = e.target.value
-        console.log(board, column)
         const requestOptions= {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
@@ -49,6 +52,12 @@ export default function GamePage(props){
         fetch('/computer/get-game', requestOptions)
         .then(response => response.json())
         .then(data => data);
+        gameSocket.send(
+            JSON.stringify({
+              board: board,
+              column: column,
+            })
+          );
     }
 
     const leaveButtonClick = () => {
@@ -58,12 +67,21 @@ export default function GamePage(props){
         };
         fetch('/computer/leave-game', requestOptions).then((_response) => {props.history.push('/')})
     }
-    
-    const test = JSON.parse(JSON.stringify(data))
-    const tablica = test.board
-    
-    console.log(typeof board)    
 
+
+    const gameSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws" + props.location.pathname + "/"
+      );
+
+      gameSocket.onclose = function (e) {
+        console.error("Game socket closed");
+      };
+
+      gameSocket.onmessage = function (e) {
+          console.log("WCHODZI TU")
+        const data = JSON.parse(e.data);
+        console.log(data)
+      };
 
     return (
         <Grid container spacing={1} align="center">
