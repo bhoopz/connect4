@@ -74,11 +74,13 @@ class Game(models.Model):
                     return True
 
     @classmethod
-    def score_every_node(self, board, player, bot):
+    def score_every_node(self, board, player, bot, BOT_LEVEL):
         score = 0
 
         for y in range(7):
             for z in range(3):
+                if BOT_LEVEL == 5 and board[z][3] == bot:
+                    score += 1
                 if(board[z][y] == bot and board[z+1][y] == bot and board[z+2][y] == bot and board[z+3][y] == bot):
                     score += math.inf
                 elif(board[z][y] == bot and board[z+1][y] == bot and board[z+2][y] == bot):
@@ -94,6 +96,8 @@ class Game(models.Model):
 
         for y in range(4):
             for z in range(6):
+                if BOT_LEVEL == 5 and board[z][3] == bot:
+                    score += 1
                 if(board[z][y] == bot and board[z][y+1] == bot and board[z][y+2] == bot and board[z][y+3] == bot):
                     score += math.inf
                 elif(board[z][y] == bot and board[z][y+1] == bot and board[z][y+2] == bot):
@@ -110,6 +114,8 @@ class Game(models.Model):
         # skos w dół
         for y in range(4):
             for z in range(3, 6):
+                if BOT_LEVEL == 5 and board[z][3] == bot:
+                    score += 1
                 if(board[z][y] == bot and board[z-1][y+1] == bot and board[z-2][y+2] == bot and board[z-3][y+3] == bot):
                     score += math.inf
                 elif(board[z][y] == bot and board[z-1][y+1] == bot and board[z-2][y+2] == bot):
@@ -126,6 +132,8 @@ class Game(models.Model):
         # skos w góre
         for y in range(4):
             for z in range(3):
+                if BOT_LEVEL == 5 and board[z][3] == bot:
+                    score += 1
                 if(board[z][y] == bot and board[z+1][y+1] == bot and board[z+2][y+2] == bot and board[z+3][y+3] == bot):
                     score += math.inf
                 elif(board[z][y] == bot and board[z+1][y+1] == bot and board[z+2][y+2] == bot):
@@ -160,7 +168,8 @@ class Game(models.Model):
         return possibilities
 
     @classmethod
-    def ai_move(self, board, player, bot):
+    def ai_move(self, board, player, bot, depth):
+        BOT_LEVEL = depth
         best_score = -math.inf
         best_column = 3
         possibilities = self.legal_moves(board)
@@ -170,7 +179,7 @@ class Game(models.Model):
                 row = self.row_change(board, column)
                 board[row][column] = bot
                 score = self.minimax(
-                    board, 3, False, -math.inf, math.inf, player, bot)
+                    board, depth, False, -math.inf, math.inf, player, bot, BOT_LEVEL)
                 print(score, column)
                 board[row][column] = 0
                 if(score > best_score):
@@ -179,6 +188,7 @@ class Game(models.Model):
 
         row = self.row_change(board, best_column)
         self.make_move(board, row, best_column, bot)
+        return board
 
     @classmethod
     def string_to_2d_array(self, data):
@@ -205,10 +215,10 @@ class Game(models.Model):
         return data
 
     @classmethod
-    def minimax(self, board, depth, maximizing_player, alpha, beta, player, bot):
+    def minimax(self, board, depth, maximizing_player, alpha, beta, player, bot, BOT_LEVEL):
 
         if(depth == 0):
-            score = self.score_every_node(board, player, bot)
+            score = self.score_every_node(board, player, bot, BOT_LEVEL)
             return score
 
         if(maximizing_player):
@@ -220,7 +230,7 @@ class Game(models.Model):
                     row = self.row_change(board, column)
                     board[row][column] = bot
                     score = self.minimax(
-                        board, depth-1, False, alpha, beta, player, bot)
+                        board, depth-1, False, alpha, beta, player, bot, BOT_LEVEL)
                     board[row][column] = 0
                     best_score = max(score, best_score)
                     alpha = max(alpha, best_score)
@@ -237,7 +247,7 @@ class Game(models.Model):
                     row = self.row_change(board, column)
                     board[row][column] = player
                     score = self.minimax(
-                        board, depth-1, True, alpha, beta, player, bot)
+                        board, depth-1, True, alpha, beta, player, bot, BOT_LEVEL)
                     board[row][column] = 0
                     best_score = min(score, best_score)
                     beta = min(beta, best_score)

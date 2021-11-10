@@ -72,8 +72,13 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         board = text_data_json['board']
-        print(board, 'TOOOOO')
-        board = Game.string_to_2d_array(board)
+        depth = int(text_data_json['depth'])
+        player = int(text_data_json['player'])
+        bot = int(text_data_json['bot'])
+        print(player, bot)
+        print(board)
+        board_temp = Game.ai_move(board, player, bot, depth)
+
         await self.send(text_data=json.dumps({
-            'board': board,
+            'board': board_temp,
         }))
