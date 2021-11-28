@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { render } from "react-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Redirect } from "react-router-dom";
 import Modal from 'react-bootstrap/Modal'
 
 
@@ -21,6 +21,7 @@ export default function GamePage(props){
       ))
     const ROWS = 6
     const COLUMNS = 7
+    const [squares, setSquares] = useState(Array(ROWS*COLUMNS))
 
     const specifyDepth = function(){
         if(props.location.pathname === "/computer/easy"){
@@ -41,7 +42,8 @@ export default function GamePage(props){
 
     const changeOrder = function(){ 
         board = defaultBoard 
-        setBoard(board)    
+        setBoard(board)  
+        setShow(false);  
         if(player === 1){ 
             const playerTemp = 2
             const botTemp = 1
@@ -89,6 +91,10 @@ export default function GamePage(props){
         }
     }
 
+    const drawCondition = function(board){
+        return board.every(row => row.every(cell => cell != 0))
+    }
+
     
     const rowChange = function(board, column){
         for(var row=0; row<6; row++){
@@ -112,12 +118,16 @@ export default function GamePage(props){
               player: player,
               bot: bot,
             })
-          );}
+          );
+          return temp
+        }
     }
 
     const playerMove = function(board, column, player){
             var row = rowChange(board, column)
-            makeMove(board, column, row, player)
+            var temp = makeMove(board, column, row, player)
+            setBoard(temp)
+            return temp
     }
     
     
@@ -129,76 +139,80 @@ export default function GamePage(props){
             const data = JSON.parse(e.data);
             const boardTemp = data.board
             setBoard(boardTemp)
-            
             if(winningConditions(boardTemp, bot)){
-                console.log("wchodzi")
                 setShow(true)
                 setBody("Unfortunately, computer won! Try once again")
+            }else if(drawCondition(boardTemp)){
+                setShow(true)
+                setBody("Draw, but it was good game!")
             }
           };
              
       }, [board,bot, player])
 
-    //   useEffect(() => {
-        
-    //   }, [board, bot, player])
 
 
 
     const sendData = function(event){ 
-            var column = event.target.value;
-            playerMove(board, column, player)
-            if(winningConditions(board, player)){
+            var column = event.target.value % 7;
+            var temp = playerMove(board, column, player)
+            setBoard(temp)
+            if(winningConditions(temp, player)){
                 setBody("Congratulations, you won!")
                 setShow(true)
+            }else if(drawCondition(board)){
+                setShow(true)
+                setBody("Draw, but it was good game!")
             }
     };
-
-    const leaveButtonClick = () => {
-        const requestOptions= {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-        };
-        fetch('/computer/leave-game', requestOptions).then((_response) => {props.history.push('/')})
-    }
 
 
       gameSocket.onclose = function (e) {
         console.error("Game socket closed");
       };
 
+      const renderSquare = function(i){
+          if(displayValue(i) == 1){
+              return <button className="squareone" key={i} value={i} onClick={sendData}></button>
+          }else if(displayValue(i) == 2){
+            return <button className="squaretwo" key={i} value={i} onClick={sendData}></button>
+          }
+          else{
+        return(
+            <button className="square" key={i} value={i} onClick={sendData}></button> 
+        )
+          }
+    }
+
+    const displayValue = function(i){
+        var temp = 5 - ~~(i/7)
+        var value = board[temp][i % 7]
+        return value
+    }
+
 
     return (
         <Grid container spacing={1} align="center">
-        {/* <div>
-              {[...new Array(rows)].map((x, rowIndex) => {
-                return (
-                  <div className="board-row" key={rowIndex}>
-                    {[...new Array(columns)].map((y, colIndex) => renderSquare(rowIndex*columns + colIndex) )}
-                  </div>
-                  
-                  
-                )
-              })
-              }
-        </div> */}
-            {<div>{board}</div>}
+            <Grid item xs={12}>
+                <div className="board">
+                    {[...new Array(ROWS)].map((x, rowIndex) => {
+                        return (
+                        <div className="board-row" key={rowIndex}>
+                            {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
+                        </div>
+                        
+                        
+                        )
+                    })
+                    }
+                </div>
+            </Grid>
             
-
-        <Grid item xs={12}>
-            {<div>
-                <input id="btn" type="button" onClick={sendData} value={0} />    
-                <input id="btn" type="button" onClick={sendData} value={1} />   
-                <input id="btn" type="button" onClick={sendData} value={2} />   
-                <input id="btn" type="button" onClick={sendData} value={3} />   
-                <input id="btn" type="button" onClick={sendData} value={4} />   
-                <input id="btn" type="button" onClick={sendData} value={5} />   
-                <input id="btn" type="button" onClick={sendData} value={6} />  
-            </div>}
-        </Grid>
         <Grid item xs={12}>
             <Button color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>
-            <Button color="secondary" variant="contained" onClick={leaveButtonClick}>Leave the Game</Button>
+        </Grid>
+        <Grid item xs={12}>
+            <Button color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
         </Grid>
         
             <Modal show={show} onHide={startNewGame} backdrop="static" keyboard={false}>
@@ -215,5 +229,8 @@ export default function GamePage(props){
             </Modal>
         
             
-        </Grid>)
+        </Grid>
+        
+        )
 }
+

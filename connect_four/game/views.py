@@ -31,6 +31,17 @@ class GetRoom(APIView):
             return Response({'Room does not found': 'Invalid data...'}, status=status.HTTP_404_NOT_FOUND)
         return Response({'Request error': 'Wrong code parameter'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def post(self, request, format=None):
+        code = request.data.get(self.lookup_url_kwarg)
+        queryset = Room.objects.filter(code=code)
+        board = request.data['board']
+        if queryset.exists():
+            room = queryset[0]
+            room.board = board
+            room.save(update_fields=['board'])
+            return Response(status=status.HTTP_200_OK)
+        return Response({'Error': 'Invalid post data...'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class JoinRoom(APIView):
     lookup_url_kwarg = 'code'
@@ -86,7 +97,7 @@ class RoomCreateView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GameView(generics.ListCreateAPIView):
+""" class GameView(generics.ListCreateAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
 
@@ -112,53 +123,7 @@ class GameCreateView(APIView):
                 game = Game(host=host, bot_level=bot_level)
                 game.save()
             return Response(GameSerializer(game).data, status=status.HTTP_201_CREATED)
-        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class GetGame(APIView):
-    serializer_class = GameSerializer
-    lookup_url_kwarg = 'level'
-
-    def get(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-        host = self.request.session.session_key
-
-        game = Game.objects.filter(host=host)
-        if game.exists():
-            data = GameSerializer(game[0]).data
-            return Response(data, status=status.HTTP_200_OK)
-        """ else:
-            level = request.GET.get(self.lookup_url_kwarg)
-            print(level)
-            if level == 'easy':
-                bot_level = 1
-            elif level == 'medium':
-                bot_level = 3
-            elif level == 'hard':
-                bot_level = 5
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            game = Game(host=host, bot_level=bot_level)
-            game.save()
-            return Response(GameSerializer(game).data, status=status.HTTP_201_CREATED) """
-
-        return Response({'Game does not found': 'Something is wrong :('}, status=status.HTTP_404_NOT_FOUND)
-
-    def post(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-
-        column = int(request.data['column'])
-        board = request.data['board']
-        board = Game.string_to_2d_array(board)
-        host = self.request.session.session_key
-        queryset = Game.objects.filter(host=host)
-        game = queryset[0]
-        depth = int(game.bot_level)
-        game.board = Game.main(column, board)
-        game.save(update_fields=['board'])
-        return Response(GameSerializer(game).data, status=status.HTTP_200_OK)
+        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST) """
 
 
 class LeaveGame(APIView):

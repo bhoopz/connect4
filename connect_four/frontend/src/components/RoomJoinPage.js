@@ -3,6 +3,7 @@ import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "
 import { Link } from "react-router-dom";
 import Room from "./Room";
 import { useParams, useHistory } from "react-router-dom";
+
 export default function RoomJoinPage(props) {
     let history = useHistory();
     const [roomCode, setRoomCode] = React.useState("");
@@ -16,7 +17,7 @@ export default function RoomJoinPage(props) {
     }
 
     const handleJoinRoomButtonClick= () => {
-        console.log(nick)
+        
         const requestOptions= {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},

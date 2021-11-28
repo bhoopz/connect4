@@ -7,18 +7,7 @@ import { Link } from "react-router-dom";
 export default function ComputerPage(props){
     const [level, setLevel] = React.useState(1);
     const [value, setValue] = React.useState("");
-    const handleButtonClick = (value, level) => {
-        setValue(value)
-        setLevel(level)
-        const requestOptions= {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({ 
-                bot_level: level,         
-            })
-        };
-        fetch("/computer/create-game", requestOptions).then((response) => response.json()).then((data) => props.history.push("/computer/" + value));
-    }
+    
 
     return (
         <Grid container spacing={1} align="center">
@@ -28,9 +17,9 @@ export default function ComputerPage(props){
                 </Typography>
             </Grid>
             <Grid item xs={12}>
-                <Button color="primary" variant="contained" value='easy' onClick={(e) => handleButtonClick(e.currentTarget.value, 1)}>Easy</Button>
-                <Button color="primary" variant="contained" value='medium' onClick={(e) => handleButtonClick(e.currentTarget.value, 3)}>Medium</Button>
-                <Button color="primary" variant="contained" value='hard' onClick={(e) => handleButtonClick(e.currentTarget.value, 5)}>Hard</Button>
+                <Button color="primary" variant="contained" value='easy' to="/computer/easy" component={Link}>Easy</Button>
+                <Button color="primary" variant="contained" value='medium' to="/computer/medium" component={Link}>Medium</Button>
+                <Button color="primary" variant="contained" value='hard' to="/computer/hard" component={Link}>Hard</Button>
             </Grid>
         </Grid>)
 }

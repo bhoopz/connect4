@@ -227,13 +227,13 @@ def start_game():
             player_move()
             if(check_conditions()):
                 break
-            ai_move(1)
+            ai_move(3)
             print(np.flipud(board))
             if(check_conditions()):
                 break
 
         else:
-            ai_move(1)
+            ai_move(3)
             print(np.flipud(board))
             if(check_conditions()):
                 break

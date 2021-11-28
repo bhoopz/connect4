@@ -29,13 +29,12 @@ class Room(models.Model):
     game_time = models.TimeField(
         _("Player time:"), auto_now=False, auto_now_add=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    board = models.CharField(max_length=200, default=make_board)
 
 
 class Game(models.Model):
 
-    board = models.CharField(max_length=200, default=make_board)
     host = models.CharField(max_length=50, unique=True)
-    bot_level = models.IntegerField(null=False, default=1)
 
     @classmethod
     def row_change(self, board, column):
@@ -171,7 +170,7 @@ class Game(models.Model):
     def ai_move(self, board, player, bot, depth):
         BOT_LEVEL = depth
         best_score = -math.inf
-        best_column = 3
+        best_column = self.legal_moves(board)
         possibilities = self.legal_moves(board)
         for x in possibilities:
             column = x
@@ -182,7 +181,7 @@ class Game(models.Model):
                     board, depth, False, -math.inf, math.inf, player, bot, BOT_LEVEL)
                 print(score, column)
                 board[row][column] = 0
-                if(score > best_score):
+                if(score >= best_score):
                     best_score = score
                     best_column = x
 
@@ -215,9 +214,13 @@ class Game(models.Model):
         return data
 
     @classmethod
+    def final_root(self, board, player, bot):
+        return self.winning_conditions(board, player) or self.winning_conditions(board, bot) or len(self.legal_moves(board)) == 0
+
+    @classmethod
     def minimax(self, board, depth, maximizing_player, alpha, beta, player, bot, BOT_LEVEL):
 
-        if(depth == 0):
+        if(depth == 0 or self.final_root(board, player, bot)):
             score = self.score_every_node(board, player, bot, BOT_LEVEL)
             return score
 

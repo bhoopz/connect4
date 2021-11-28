@@ -28,3 +28,57 @@ body {
 textarea {
   resize: none;
 }
+
+.square {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 0;
+  background: rgb(255, 255, 255);
+}
+.square:hover {
+  filter: brightness(90%);
+}
+
+.squareone {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 0;
+  background: rgb(255, 0, 0);
+}
+.squaretwo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 0;
+  background: rgb(54, 2, 197);
+}
+
+.board {
+  background-color: rgb(26, 26, 26);
+  text-align: center;
+  width: 100%;
+}
+
+.board-row {
+  background-color: rgb(33, 132, 69);
+  margin: 0 auto;
+  display: inline-block;
+}
+
+textarea,
+input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 10px;
+}
+
+#content {
+  width: 100%;
+  width: 100vw;
+}
+
+#container {
+  background-color: aqua;
+}

@@ -10,9 +10,6 @@ urlpatterns = [
 
 
 
-    path('computer/get-game', GetGame.as_view()),
-    path('computer/games', GameView.as_view()),
-    path('computer/create-game', GameCreateView.as_view()),
-    path('computer/leave-game', LeaveGame.as_view()),
+
 
 ]
