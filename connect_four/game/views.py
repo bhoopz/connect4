@@ -6,12 +6,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
 import numpy as np
+import uuid
 
 
 # Create your views here.
 
 
-class RoomView(generics.ListAPIView):
+class RoomView(generics.ListCreateAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
 
@@ -34,11 +35,22 @@ class GetRoom(APIView):
     def post(self, request, format=None):
         code = request.data.get(self.lookup_url_kwarg)
         queryset = Room.objects.filter(code=code)
-        board = request.data['board']
         if queryset.exists():
             room = queryset[0]
-            room.board = board
-            room.save(update_fields=['board'])
+            if 'board' in request.data:
+                board = request.data['board']
+                room.board = board
+            if 'decision' in request.data:
+                decision = bool(request.data['decision'])
+                room.host_starts = decision
+            if 'host_time' in request.data:
+                host_time = request.data['host_time']
+                room.host_time = host_time
+            if 'player_time' in request.data:
+                player_time = request.data['player_time']
+                room.player_time = player_time
+            room.save(update_fields=[
+                      'board', 'host_starts', 'host_time', 'player_time'])
             return Response(status=status.HTTP_200_OK)
         return Response({'Error': 'Invalid post data...'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -53,8 +65,11 @@ class JoinRoom(APIView):
         code = request.data.get(self.lookup_url_kwarg)
         if code != None:
             room_finded = Room.objects.filter(code=code)
+            player_id = uuid.uuid4()
             if room_finded.exists():
                 room = room_finded[0]
+                room.player_id = player_id
+                room.save(update_fields=['player_id'])
                 self.request.session['room_code'] = code
                 return Response({"Success": "Joined the room!"}, status=status.HTTP_200_OK)
             return Response({'Error': 'Invalid room code...'}, status=status.HTTP_400_BAD_REQUEST)
@@ -81,16 +96,22 @@ class RoomCreateView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             game_time = serializer.data.get('game_time')
+            host_time = game_time
+            player_time = game_time
             host = self.request.session.session_key
             queryset = Room.objects.filter(host=host)
             if queryset.exists():
                 room = queryset[0]
                 room.game_time = game_time
-                room.save(update_fields=['game_time'])
+                room.host_time = host_time
+                room.player_time = player_time
+                room.save(update_fields=['game_time',
+                          'host_time', 'player_time'])
                 self.request.session['room_code'] = room.code
                 return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:
-                room = Room(host=host, game_time=game_time)
+                room = Room(host=host, game_time=game_time,
+                            host_time=host_time, player_time=player_time)
                 room.save()
                 self.request.session['room_code'] = room.code
             return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
@@ -126,13 +147,13 @@ class GameCreateView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST) """
 
 
-class LeaveGame(APIView):
+class LeaveRoom(APIView):
     def post(self, request, format=None):
         host = self.request.session.session_key
-        finded_game = Game.objects.filter(host=host)
-        if finded_game.exists():
-            game = finded_game[0]
-            game.delete()
+        finded_room = Room.objects.filter(host=host)
+        if finded_room.exists():
+            room = finded_room[0]
+            room.delete()
         return Response(status=status.HTTP_200_OK)
 
 

@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
 import { useParams, Link, Redirect } from "react-router-dom";
 import Modal from 'react-bootstrap/Modal'
+import { Prompt } from 'react-router'
 
 
 
@@ -215,7 +216,7 @@ export default function GamePage(props){
             <Button color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
         </Grid>
         
-            <Modal show={show} onHide={startNewGame} backdrop="static" keyboard={false}>
+            <Modal show={show} onHide={startNewGame} backdrop="static" keyboard={false} centered>
                 <Modal.Header>
                     <Modal.Title>Game Ended</Modal.Title>
                 </Modal.Header>

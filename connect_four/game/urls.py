@@ -7,6 +7,7 @@ urlpatterns = [
     path('player/get-room', GetRoom.as_view()),
     path('player/join-room', JoinRoom.as_view()),
     path('player/user-in-room', UserInRoom.as_view()),
+    path('player/leave-room', LeaveRoom.as_view()),
 
 
 

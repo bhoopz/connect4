@@ -3,6 +3,7 @@ import string
 import random
 import numpy as np
 import math
+import uuid
 from django.utils.translation import gettext as _
 
 # Create your models here.
@@ -23,13 +24,27 @@ def make_board():
     return board
 
 
+def random_bool():
+    value = bool(random.getrandbits(1))
+    return value
+
+
 class Room(models.Model):
     code = models.CharField(max_length=5, default=generate_code, unique=True)
     host = models.CharField(max_length=50, unique=True)
     game_time = models.TimeField(
-        _("Player time:"), auto_now=False, auto_now_add=False)
+        _("Game time:"), auto_now=False, auto_now_add=False)
     created_at = models.DateTimeField(auto_now_add=True)
     board = models.CharField(max_length=200, default=make_board)
+    host_id = models.UUIDField(
+        default=uuid.uuid4, editable=False, unique=True)
+    player_id = models.UUIDField(default=None,
+                                 null=True, editable=False, unique=True)
+    host_starts = models.BooleanField(default=random_bool)
+    host_time = models.TimeField(
+        _("Host time:"), auto_now=False, auto_now_add=False, null=True)
+    player_time = models.TimeField(
+        _("Player time:"), auto_now=False, auto_now_add=False, null=True)
 
 
 class Game(models.Model):

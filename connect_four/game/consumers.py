@@ -9,7 +9,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_code = self.scope['url_route']['kwargs']['roomCode']
         self.room_group_name = 'chat_%s' % self.room_code
-        print(self.scope['client'], " <-----self.scope['client']")
 
         # Dołącza do grupy
         await self.channel_layer.group_add(
@@ -28,17 +27,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Otrzymuje wiadomość od WebSocket
     async def receive(self, text_data):
-        user2 = self.scope["user"]
         text_data_json = json.loads(text_data)
         message = None
         nick = None
         board = None
+        decision = None
         if 'message' in text_data_json:
             message = text_data_json['message']
         if 'nick' in text_data_json:
             nick = text_data_json['nick']
         if 'board' in text_data_json:
             board = text_data_json['board']
+        if 'decision' in text_data_json:
+            decision = text_data_json['decision']
+        print(text_data_json)
 
         # Wysyła wiadomość do grupy
         if message != None and nick != None:
@@ -56,6 +58,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'room_data',
                     'board': board,
+                }
+            )
+        if decision != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_decision',
+                    'decision': decision,
                 }
             )
 
@@ -77,6 +87,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'board': board,
+        }))
+
+    async def send_decision(self, event):
+        decision = event['decision']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'decision': decision,
         }))
 
 
