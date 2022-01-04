@@ -2,6 +2,8 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import *
+import asyncio
+import sys
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -25,6 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
+    # Tutorial how to not use Websockets BloodTrail
     # Otrzymuje wiadomość od WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -32,6 +35,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         nick = None
         board = None
         decision = None
+        player_id = None
+        who_won_string = None
+        host_score = None
+        player_score = None
+        host_time = None
+        host_seconds = None
+        player_time = None
+        player_seconds = None
         if 'message' in text_data_json:
             message = text_data_json['message']
         if 'nick' in text_data_json:
@@ -40,7 +51,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             board = text_data_json['board']
         if 'decision' in text_data_json:
             decision = text_data_json['decision']
-        print(text_data_json)
+        if 'player_id' in text_data_json:
+            player_id = text_data_json['player_id']
+        if 'who_won_string' in text_data_json:
+            who_won_string = text_data_json['who_won_string']
+        if 'host_score' in text_data_json:
+            host_score = text_data_json['host_score']
+        if 'player_score' in text_data_json:
+            player_score = text_data_json['player_score']
+        if 'host_time' in text_data_json:
+            host_time = text_data_json['host_time']
+        if 'host_seconds' in text_data_json:
+            host_seconds = text_data_json['host_seconds']
+        if 'player_time' in text_data_json:
+            player_time = text_data_json['player_time']
+        if 'player_seconds' in text_data_json:
+            player_seconds = text_data_json['player_seconds']
+        print(text_data_json, "to dostaje ")
 
         # Wysyła wiadomość do grupy
         if message != None and nick != None:
@@ -68,8 +95,64 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'decision': decision,
                 }
             )
+        if player_id != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'player_info',
+                    'player_id': player_id,
+                }
+            )
+
+        if who_won_string != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'who_won',
+                    'who_won_string': who_won_string,
+                }
+            )
+
+        if player_score != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_player_score',
+                    'player_score': player_score,
+                }
+            )
+
+        if host_score != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'send_host_score',
+                    'host_score': host_score,
+                }
+            )
+
+        if host_time != None and host_seconds != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'host_time_menagement',
+                    'host_time': host_time,
+                    'host_seconds': host_seconds,
+                }
+            )
+
+        if player_time != None and player_seconds != None:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'player_time_menagement',
+                    'player_time': player_time,
+                    'player_seconds': player_seconds,
+                }
+            )
 
     # Otrzymuje wiadomość od grupy
+
     async def chat_message(self, event):
         message = event['message']
         nick = event['nick']
@@ -95,6 +178,58 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'decision': decision,
+        }))
+
+    async def player_info(self, event):
+        player_id = event['player_id']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'player_id': player_id,
+        }))
+
+    async def who_won(self, event):
+        who_won_string = event['who_won_string']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'who_won_string': who_won_string,
+        }))
+
+    async def send_player_score(self, event):
+        player_score = event['player_score']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'player_score': player_score,
+        }))
+
+    async def send_host_score(self, event):
+        host_score = event['host_score']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'host_score': host_score,
+        }))
+
+    async def host_time_menagement(self, event):
+        host_time = event['host_time']
+        host_seconds = event['host_seconds']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'host_time': host_time,
+            'host_seconds': host_seconds,
+        }))
+
+    async def player_time_menagement(self, event):
+        player_time = event['player_time']
+        player_seconds = event['player_seconds']
+
+        # Wysyła wiadomość do WebSocket
+        await self.send(text_data=json.dumps({
+            'player_time': player_time,
+            'player_seconds': player_seconds,
         }))
 
 

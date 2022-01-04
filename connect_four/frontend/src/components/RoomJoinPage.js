@@ -23,6 +23,7 @@ export default function RoomJoinPage(props) {
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({ 
                 code: roomCode,
+                player_nickname: nick,
             })
         };
         fetch("/player/join-room", requestOptions).then((response) => {

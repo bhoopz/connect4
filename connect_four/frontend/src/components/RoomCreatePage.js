@@ -38,6 +38,7 @@ export default function RoomCreatePage(props) {
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({ 
                 game_time: '00:' + value + ':00',
+                host_nickname: nick,
             })
         };
         fetch("/player/create-room", requestOptions).then((response) => response.json()).then((data) => props.history.push({pathname:"/player/room/" + data.code, state:{nick}}));

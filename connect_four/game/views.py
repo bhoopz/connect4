@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 import numpy as np
 import uuid
+import asyncio
 
 
 # Create your views here.
@@ -33,10 +34,13 @@ class GetRoom(APIView):
         return Response({'Request error': 'Wrong code parameter'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
+        loop = asyncio.ProactorEventLoop()
+        asyncio.set_event_loop(loop)
         code = request.data.get(self.lookup_url_kwarg)
         queryset = Room.objects.filter(code=code)
         if queryset.exists():
             room = queryset[0]
+            print(request.data)
             if 'board' in request.data:
                 board = request.data['board']
                 room.board = board
@@ -65,11 +69,13 @@ class JoinRoom(APIView):
         code = request.data.get(self.lookup_url_kwarg)
         if code != None:
             room_finded = Room.objects.filter(code=code)
+            player_nickname = request.data['player_nickname']
             player_id = uuid.uuid4()
             if room_finded.exists():
                 room = room_finded[0]
+                room.player_nickname = player_nickname
                 room.player_id = player_id
-                room.save(update_fields=['player_id'])
+                room.save(update_fields=['player_id', 'player_nickname'])
                 self.request.session['room_code'] = code
                 return Response({"Success": "Joined the room!"}, status=status.HTTP_200_OK)
             return Response({'Error': 'Invalid room code...'}, status=status.HTTP_400_BAD_REQUEST)
@@ -96,22 +102,25 @@ class RoomCreateView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             game_time = serializer.data.get('game_time')
+            host_nickname = request.data['host_nickname']
+            print(host_nickname)
             host_time = game_time
             player_time = game_time
             host = self.request.session.session_key
             queryset = Room.objects.filter(host=host)
             if queryset.exists():
                 room = queryset[0]
+                room.host_nickname = host_nickname
                 room.game_time = game_time
                 room.host_time = host_time
                 room.player_time = player_time
                 room.save(update_fields=['game_time',
-                          'host_time', 'player_time'])
+                          'host_time', 'player_time', 'host_nickname'])
                 self.request.session['room_code'] = room.code
                 return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:
                 room = Room(host=host, game_time=game_time,
-                            host_time=host_time, player_time=player_time)
+                            host_time=host_time, player_time=player_time, host_nickname=host_nickname)
                 room.save()
                 self.request.session['room_code'] = room.code
             return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
