@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Button, Grid, Typography, TextField, FormHelperText, FormControl, Radio, RadioGroup, FormControlLabel, Slider, makeStyles } from "@material-ui/core"
+import { Button, Grid, Typography, TextField, FormHelperText, FormControl, Radio, RadioGroup, FormControlLabel, Slider, makeStyles, Checkbox } from "@material-ui/core"
 import Select from 'react-select'
 
 export default function RoomCreatePage(props) {
     let [value, setValue] = React.useState(5);
     const [nick, setNick] = React.useState("Anonymous")
+    let [checkboxValue, setCheckboxValue] = React.useState(false)
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -39,9 +41,14 @@ export default function RoomCreatePage(props) {
             body: JSON.stringify({ 
                 game_time: '00:' + value + ':00',
                 host_nickname: nick,
+                public: checkboxValue,
             })
         };
         fetch("/player/create-room", requestOptions).then((response) => response.json()).then((data) => props.history.push({pathname:"/player/room/" + data.code, state:{nick}}));
+    }
+
+    const handleCheckboxChange = (e) => {
+        e.target.checked==true ? setCheckboxValue(true) : setCheckboxValue(false);
     }
 
     
@@ -92,6 +99,13 @@ export default function RoomCreatePage(props) {
                     labelPlacement = "bottom" />       
             </RadioGroup>
             {buttonValue==="with" ? generateSlider() : null}
+            <FormControlLabel
+                    value={"checked"}
+                    onChange={handleCheckboxChange}
+                    control={<Checkbox color="primary"/>}
+                    label = "Public room"
+                    labelPlacement = "bottom" /> 
+            
             
             </FormControl>
                               

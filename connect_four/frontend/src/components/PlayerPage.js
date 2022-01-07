@@ -9,10 +9,7 @@ export default function PlayerPage(props){
     <Button color="primary" variant="contained" to="/player/create" component={Link} >CREATE ROOM</Button>
 </Grid>
 <Grid item xs={12}>
-    <Button color="secondary" variant="contained" to="/player/join" component={Link}>JOIN ROOM</Button>
-</Grid>
-<Grid item xs={12}>
-    <Button color="primary" variant="contained" to="/player/room" component={Link}>FIND PLAYER</Button>
+    <Button color="primary" variant="contained" to="/player/join" component={Link}>JOIN ROOM</Button>
 </Grid>
 <Grid item xs={12}>
     <Button color="secondary" variant="contained" to="/" component={Link}>BACK</Button>

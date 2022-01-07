@@ -47,6 +47,7 @@ class Room(models.Model):
         _("Player time:"), auto_now=False, auto_now_add=False, null=True)
     host_nickname = models.CharField(max_length=16, null=True)
     player_nickname = models.CharField(max_length=16, null=True)
+    public = models.BooleanField(default=False)
 
 
 class Game(models.Model):

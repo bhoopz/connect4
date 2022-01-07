@@ -6,12 +6,16 @@ import Room from "./Room"
 import PlayerPage from "./PlayerPage"
 import ComputerPage from "./ComputerPage"
 import GamePage from "./GamePage"
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory } from "react-router-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
+
+
 
 export default function HomePage(props) {
 
+    let history = useHistory();
     const [data, setData] = useState([]);
+    
 
     useEffect(() => {
         async function fetchMyAPI() {
@@ -23,16 +27,38 @@ export default function HomePage(props) {
         fetchMyAPI()
       }, [])
 
+      const handleJoinRoomButtonClick= (roomCode) => {
+        
+        const nick = "Anonymous"
+        const requestOptions= {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                code: roomCode,
+                player_nickname: nick,
+            })
+        };
+        fetch("/player/join-room", requestOptions).then((response) => {
+            if(response.ok){
+                history.push({pathname:`/player/room/${roomCode}`, state:{nick}})
+            }
+        })
+    }
+
 
     const generateHomePage = () => {
-        return (<Grid container spacing={1} align="center">
+        return (<Grid container spacing={2} align="center">
             <Grid item xs={12}>
             <Typography component="h3" variant="h3">
                 Connect 4
             </Typography>
-            {<div>{JSON.stringify(data)}</div>}
+
             {data.map(function(item, i){
-            return <li key={i}>{item.id} - {item.game_time}</li>
+            return (item.public==true ?
+            <Grid item xs={12} key={i}> 
+                <Button color="inherit" variant="contained" onClick={() => handleJoinRoomButtonClick(item.code)} key={i}>{item.host_nickname} - {item.game_time}</Button>
+            </Grid>
+            : null)
 })}
             
         </Grid>      

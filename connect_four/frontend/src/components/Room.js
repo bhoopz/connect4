@@ -37,6 +37,7 @@ export default function Room(props) {
     var [hostNickname, setHostNickname] = useState("")
     var [playerNickname, setPlayerNickname] = useState("")
     var [whoWonString, setWhoWonString] = useState("");
+    const [ifPublic, setIfPublic] = useState(false)
   
 
 
@@ -69,6 +70,7 @@ export default function Room(props) {
             }
             setHostNickname(data.host_nickname)
             setPlayerNickname(data.player_nickname)
+            setIfPublic(data.public)
                
         });
     }
@@ -653,8 +655,10 @@ const makeMoveButtonClick = function(event){
                 </DialogTitle>
                 <DialogContent>
                 <DialogContentText id="alert-dialog-description" textAlign="center">
-                <Typography component={'span'} variant="h3">Your room code:<br></br></Typography>
-                <Typography component={'span'} variant="h2"><b>{roomCode}</b></Typography>
+                  {ifPublic==false ? (<Typography component={'span'} variant="h3">Your room code:<br></br></Typography>) : null}
+                  {ifPublic==false ? (<Typography component={'span'} variant="h2"><b>{roomCode}</b></Typography>) : null}
+                 
+                
                 </DialogContentText>
               </DialogContent>
               </Dialog>

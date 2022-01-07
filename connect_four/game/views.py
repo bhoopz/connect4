@@ -103,24 +103,25 @@ class RoomCreateView(APIView):
         if serializer.is_valid():
             game_time = serializer.data.get('game_time')
             host_nickname = request.data['host_nickname']
-            print(host_nickname)
+            public = request.data['public']
             host_time = game_time
             player_time = game_time
             host = self.request.session.session_key
             queryset = Room.objects.filter(host=host)
             if queryset.exists():
                 room = queryset[0]
+                room.public = public
                 room.host_nickname = host_nickname
                 room.game_time = game_time
                 room.host_time = host_time
                 room.player_time = player_time
                 room.save(update_fields=['game_time',
-                          'host_time', 'player_time', 'host_nickname'])
+                          'host_time', 'player_time', 'host_nickname', 'public'])
                 self.request.session['room_code'] = room.code
                 return Response(RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:
                 room = Room(host=host, game_time=game_time,
-                            host_time=host_time, player_time=player_time, host_nickname=host_nickname)
+                            host_time=host_time, player_time=player_time, host_nickname=host_nickname, public=public)
                 room.save()
                 self.request.session['room_code'] = room.code
             return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
