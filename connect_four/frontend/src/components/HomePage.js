@@ -72,7 +72,7 @@ export default function HomePage(props) {
     }
 
 
-    return (<Router>
+    return (
         <Switch>
             <Route exact path="/">
                 {generateHomePage}
@@ -94,6 +94,6 @@ export default function HomePage(props) {
             <Route path="/computer/hard" component={GamePage}>
             </Route>
         </Switch>
-        </Router>);
+      );
 }
 

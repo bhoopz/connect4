@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { render } from "react-dom";
 import { useParams, useHistory, Redirect } from "react-router-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
@@ -39,7 +39,6 @@ export default function Room(props) {
     var [whoWonString, setWhoWonString] = useState("");
     const [ifPublic, setIfPublic] = useState(false)
   
-
 
     if(!history.location.state || !history.location.state.nick){
         return <Redirect to ="/player/join/" />
@@ -90,11 +89,10 @@ export default function Room(props) {
     
 
 
-      const roomSocket = new WebSocket(
+      const roomSocket =useMemo(()=> new WebSocket(
         "ws://" + window.location.host + "/ws/player/room/" + roomCode + "/"
-      );
-
-
+      )
+      ,[])
 
       roomSocket.onclose = function (e) {
         console.error("Chat socket closed");
@@ -116,6 +114,7 @@ export default function Room(props) {
           };}
     };
 
+ 
     useEffect(() => {
 
         roomSocket.onmessage = function (e) {
@@ -168,7 +167,8 @@ export default function Room(props) {
       }, [decision, isHost])
 
       useEffect(() => {
-        if(playerId !== "" && playerId !== null){
+        if(playerId ){
+
           playerJoined()
         }  
         getRoomDetails()
@@ -183,7 +183,7 @@ export default function Room(props) {
               var tempString = playerNickname + " WON!"
               var tempScore = playerScore + 1
               if(tempString !== " WON!"){
-              roomSocket.onopen = () => roomSocket.send(
+              roomSocket.send(
                 JSON.stringify({
                   who_won_string : tempString,
                   player_score : tempScore,
@@ -194,7 +194,7 @@ export default function Room(props) {
                 }));
               }
             }else{
-              roomSocket.onopen = () => roomSocket.send(
+              roomSocket.send(
                       JSON.stringify({
                         host_time : hostTime,
                         host_seconds : hostSeconds,
@@ -206,8 +206,9 @@ export default function Room(props) {
                   clearInterval(myInterval)
                   var tempString = hostNickname + " WON!"
                   var tempScore = hostScore + 1
+                  console.log("cdxd")
                   if(tempString !== " WON!"){
-                    roomSocket.onopen = () => roomSocket.send(
+                    roomSocket.send(
                     JSON.stringify({
                       who_won_string : tempString,
                       host_score : tempScore,
@@ -218,7 +219,8 @@ export default function Room(props) {
                     }));
                   }                
               }else{
-                roomSocket.onopen = () => roomSocket.send(
+          
+               roomSocket.send(
                   JSON.stringify({
                     host_time : hostTime,
                     host_seconds : hostSeconds,
@@ -244,19 +246,22 @@ export default function Room(props) {
       //       }));
       //   }
       // },[hostSeconds, playerSeconds])
-        
+    
       useEffect(()=>{
-        
+      if(!didPlayerJoin) return
         myInterval = setInterval(() => {
+          
           if(didPlayerJoin && gameTime !== '00:00:00' && isHost == true){
-          if(decision === true){
-                if (hostSeconds > 0) {
-                    setHostSeconds(hostSeconds - 1);
-                }
-                if (hostSeconds === 0) {
-                    if (hostTime === 0) {
-                      clearInterval(myInterval)
-                    } else {
+            if(decision === true){
+              if (hostSeconds > 0) {
+                setHostSeconds(hostSeconds - 1);
+                console.log(hostSeconds)
+              }
+              if (hostSeconds === 0) {
+                if (hostTime === 0) {
+                  clearInterval(myInterval)
+                } else {
+                  
                         setHostTime(hostTime - 1);
                         setHostSeconds(59);
                     }
@@ -306,7 +311,11 @@ export default function Room(props) {
                 clearInterval(myInterval);
               };
         });
+// useEffect(()=>{
+// return ()=>{
 
+// }
+// },[])
 
       function changeTimeString(xMinutes, xSeconds){
         if(xMinutes < 10){
