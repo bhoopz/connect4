@@ -34,8 +34,7 @@ class GetRoom(APIView):
         return Response({'Request error': 'Wrong code parameter'}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
-        loop = asyncio.ProactorEventLoop()
-        asyncio.set_event_loop(loop)
+
         code = request.data.get(self.lookup_url_kwarg)
         queryset = Room.objects.filter(code=code)
         if queryset.exists():
@@ -53,8 +52,11 @@ class GetRoom(APIView):
             if 'player_time' in request.data:
                 player_time = request.data['player_time']
                 room.player_time = player_time
+            if 'player_id' in request.data:
+                player_id = request.data['player_id']
+                room.player_id = player_id
             room.save(update_fields=[
-                      'board', 'host_starts', 'host_time', 'player_time'])
+                      'board', 'host_starts', 'host_time', 'player_time', 'player_id'])
             return Response(status=status.HTTP_200_OK)
         return Response({'Error': 'Invalid post data...'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -73,11 +75,14 @@ class JoinRoom(APIView):
             player_id = uuid.uuid4()
             if room_finded.exists():
                 room = room_finded[0]
-                room.player_nickname = player_nickname
-                room.player_id = player_id
-                room.save(update_fields=['player_id', 'player_nickname'])
-                self.request.session['room_code'] = code
-                return Response({"Success": "Joined the room!"}, status=status.HTTP_200_OK)
+                if room.player_id == None:
+                    room.player_nickname = player_nickname
+                    room.player_id = player_id
+                    room.save(update_fields=['player_id', 'player_nickname'])
+                    self.request.session['room_code'] = code
+                    return Response({"Success": "Joined the room!"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'Error': 'Room is full'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'Error': 'Invalid room code...'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'Error': 'Invalid post data...'}, status=status.HTTP_400_BAD_REQUEST)
 

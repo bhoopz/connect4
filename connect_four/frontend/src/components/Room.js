@@ -8,11 +8,14 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { Prompt } from 'react-router';
 
 
 
 
 export default function Room(props) {
+
+  
   
     let params = useParams();
     let history = useHistory();
@@ -44,6 +47,52 @@ export default function Room(props) {
         return <Redirect to ="/player/join/" />
     }
 
+    window.onbeforeunload = function(){
+      userLeftPage();
+  };
+
+    const userLeftPage = () =>{
+      if(isHost===false){
+              var tempTime = convertTime(gameTime)
+              var tempSeconds = convertSeconds(gameTime)
+              setHostTime(tempTime)
+              setHostSeconds(tempSeconds)
+              setPlayerTime(tempTime)
+              setPlayerSeconds(tempSeconds)
+              setPlayerId("")
+              roomSocket.send(
+                JSON.stringify({
+                  player_id: "",
+                  host_time : tempTime,
+                  host_seconds : tempSeconds,
+                  player_time : tempTime,
+                  player_seconds : tempSeconds,
+                }))
+                const requestOptions= {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json'},
+                  body: JSON.stringify({ 
+                      player_id: null,
+                      board: defaultBoard,
+                      code: roomCode,
+                      host_time: gameTime,
+                      player_time: gameTime
+                  })
+              };
+              fetch("/player/get-room", requestOptions).then((response) =>props.history.push("/"))
+            }else{
+              roomSocket.send(
+                JSON.stringify({
+                  who_won_string: "Host left, room expired",
+                }))
+                const requestOptions = {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                };
+                fetch("/player/leave-room", requestOptions).then((response) => props.history.push("/"))
+            }
+    }
+
     const getRoomDetails = () => {
         fetch('/player/get-room' + '?code=' + params.roomCode)
         .then((response) => response.json())
@@ -73,8 +122,8 @@ export default function Room(props) {
                
         });
     }
-
-
+    
+    
 
 
     function stringConverter(str) {
@@ -95,6 +144,7 @@ export default function Room(props) {
       ,[])
 
       roomSocket.onclose = function (e) {
+        userLeftPage();
         console.error("Chat socket closed");
       };
 
@@ -167,9 +217,11 @@ export default function Room(props) {
       }, [decision, isHost])
 
       useEffect(() => {
-        if(playerId ){
-
+        if(playerId){
           playerJoined()
+          
+        }else{
+          setDidPlayerJoin(false)
         }  
         getRoomDetails()
       },[playerId])
@@ -193,20 +245,11 @@ export default function Room(props) {
                   player_seconds : playerSeconds,
                 }));
               }
-            }else{
-              roomSocket.send(
-                      JSON.stringify({
-                        host_time : hostTime,
-                        host_seconds : hostSeconds,
-                        player_time : playerTime,
-                        player_seconds : playerSeconds,
-                      }));
             }
-            if (playerSeconds === 0 && playerTime === 0) {         
+            else if (playerSeconds === 0 && playerTime === 0) {         
                   clearInterval(myInterval)
                   var tempString = hostNickname + " WON!"
                   var tempScore = hostScore + 1
-                  console.log("cdxd")
                   if(tempString !== " WON!"){
                     roomSocket.send(
                     JSON.stringify({
@@ -219,14 +262,16 @@ export default function Room(props) {
                     }));
                   }                
               }else{
-          
-               roomSocket.send(
-                  JSON.stringify({
-                    host_time : hostTime,
-                    host_seconds : hostSeconds,
-                    player_time : playerTime,
-                    player_seconds : playerSeconds,
-                  }));
+                if(didPlayerJoin==true){
+                  roomSocket.send(
+                    JSON.stringify({
+                      host_time : hostTime,
+                      host_seconds : hostSeconds,
+                      player_time : playerTime,
+                      player_seconds : playerSeconds,
+                    }));
+                }
+               
               }
               
               
@@ -235,17 +280,6 @@ export default function Room(props) {
       },[hostSeconds, playerSeconds])
 
 
-      // useEffect(() => {
-      //   if(isHost==true && (hostTime != 0 || hostSeconds != 0) && (playerTime != 0 || playerSeconds != 0)){
-      //     roomSocket.onopen = () => roomSocket.send(
-      //       JSON.stringify({
-      //         host_time : hostTime,
-      //         host_seconds : hostSeconds,
-      //         player_time : playerTime,
-      //         player_seconds : playerSeconds,
-      //       }));
-      //   }
-      // },[hostSeconds, playerSeconds])
     
       useEffect(()=>{
       if(!didPlayerJoin) return
@@ -255,7 +289,6 @@ export default function Room(props) {
             if(decision === true){
               if (hostSeconds > 0) {
                 setHostSeconds(hostSeconds - 1);
-                console.log(hostSeconds)
               }
               if (hostSeconds === 0) {
                 if (hostTime === 0) {
@@ -311,10 +344,36 @@ export default function Room(props) {
                 clearInterval(myInterval);
               };
         });
-// useEffect(()=>{
-// return ()=>{
 
-// }
+// useEffect(()=>{
+//   return ()=>{
+//     if(isHost===false){
+//       roomSocket.send(
+//         JSON.stringify({
+//           player_id: "",
+//         }))
+//         const requestOptions= {
+//           method: 'POST',
+//           headers: { 'Content-Type': 'application/json'},
+//           body: JSON.stringify({ 
+//               player_id: null,
+//               board: defaultBoard,
+//               code: roomCode,
+//           })
+//       };
+//       fetch("/player/get-room", requestOptions).then((response) =>{response})
+//     }else{
+//       roomSocket.send(
+//         JSON.stringify({
+//           who_won_string: "Host left, room expired",
+//         }))
+//         const requestOptions = {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//         };
+//         fetch("/player/leave-room", requestOptions).then((response) => props.history.push("/"))
+//     }
+//   }
 // },[])
 
       function changeTimeString(xMinutes, xSeconds){
@@ -525,14 +584,7 @@ const makeMoveButtonClick = function(event){
       }
     }
 
-    function leaveRoom(){
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      };
-      fetch("/player/leave-room", requestOptions).then((response) => props.history.push("/"))
-      
-    }
+
 
     const showTime = (timeMinutes, timeSeconds) => {
       return(<Grid item xs={12}>
@@ -674,7 +726,7 @@ const makeMoveButtonClick = function(event){
 
               <Grid item xs={2}>
                 <p>{isHost.toString()}</p>
-                <Button color="secondary" variant="contained" onClick={leaveRoom}>Leave the Game</Button>
+                <Button color="secondary" variant="contained" onClick={userLeftPage}>Leave the Game</Button>
               </Grid>
       </Grid>
   </div>);

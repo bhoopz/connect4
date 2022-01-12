@@ -87,6 +87,7 @@ export default function RoomCreatePage(props) {
                     variant="outlined"
                     required={true}
                     onChange={handleTextFieldChange2}
+                    inputProps={{ maxLength: 12 }}
                 />
                 <RadioGroup row value={buttonValue} onChange={handleButtonChange}>
                 <FormControlLabel value={"with"}

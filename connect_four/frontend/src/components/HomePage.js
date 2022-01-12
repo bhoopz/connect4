@@ -7,25 +7,49 @@ import PlayerPage from "./PlayerPage"
 import ComputerPage from "./ComputerPage"
 import GamePage from "./GamePage"
 import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory } from "react-router-dom";
-import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
+import {Grid, TextField, Typography, Button, FormControl, FormHelperText, makeStyles} from "@material-ui/core"
 
 
+const useStyles = makeStyles({
+    flexGrow: {
+        flex: '1',
+      },
+    button: {
+      width: '100%',
+      backgroundColor: 'rgb(255, 190, 166)',
+      borderRadius: '10px',
+      fontSize: "min(max(10px, 2vw), 16px)",
+      '&:hover': {
+        backgroundColor: 'rgb(252, 192, 96)',
+    },
+  }})
 
 export default function HomePage(props) {
 
     let history = useHistory();
     const [data, setData] = useState([]);
-    
+    const classes = useStyles()
+
+    async function fetchMyAPI() {
+        let response = await fetch('/player/room')
+        response = await response.json()
+        setData(response)
+      }
 
     useEffect(() => {
-        async function fetchMyAPI() {
-          let response = await fetch('/player/room')
-          response = await response.json()
-          setData(response)
-        }
-    
         fetchMyAPI()
       }, [])
+
+    //   useEffect(() => {
+    //     const interval = setInterval(() => {
+    //       fetchMyAPI()
+    //     }, 1000);
+    //     return () => clearInterval(interval);
+    //   }, []);
+
+      
+
+      
 
       const handleJoinRoomButtonClick= (roomCode) => {
         
@@ -52,14 +76,19 @@ export default function HomePage(props) {
             <Typography component="h3" variant="h3">
                 Connect 4
             </Typography>
+            
 
+            <div className="live-rooms">
             {data.map(function(item, i){
-            return (item.public==true ?
+            return (item.public==true && item.player_id==null ?
+                
             <Grid item xs={12} key={i}> 
-                <Button color="inherit" variant="contained" onClick={() => handleJoinRoomButtonClick(item.code)} key={i}>{item.host_nickname} - {item.game_time}</Button>
+                <Button className={classes.button}  variant="contained" disabled={item.player_id!=null} onClick={() => handleJoinRoomButtonClick(item.code)} key={i}>{item.host_nickname} - {item.game_time=="00:00:00" ? "None" : item.game_time.split('00:')[1]}</Button>
             </Grid>
+            
             : null)
 })}
+</div>
             
         </Grid>      
         <Grid item xs={12}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { render } from "react-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
 import { useParams, Link, Redirect } from "react-router-dom";
@@ -15,14 +15,15 @@ export default function GamePage(props){
     var [player, setPlayer] = useState(1)
     var [bot, setBot] = useState(2)
     var [depth, setDepth] = useState(3)
-    const [show, setShow] = useState(false);
     const [body, setBody] = useState("")
-    const [gameSocket, setGameSocket] = useState(new WebSocket(
-        "ws://" + window.location.host + "/ws" + props.location.pathname + "/"
-      ))
     const ROWS = 6
     const COLUMNS = 7
     const [squares, setSquares] = useState(Array(ROWS*COLUMNS))
+
+    const gameSocket =useMemo(()=> new WebSocket(
+        "ws://" + window.location.host + "/ws" + props.location.pathname + "/"
+      )
+      ,[])
 
     const specifyDepth = function(){
         if(props.location.pathname === "/computer/easy"){
@@ -34,17 +35,20 @@ export default function GamePage(props){
         }
     }
     
-    
+    const classes = {
+        root: {
+          flexGrow: 1
+        }};
 
     const startNewGame = function(){
         setBoard(defaultBoard);
-        setShow(false);
+        setBody("");
     }
 
     const changeOrder = function(){ 
         board = defaultBoard 
         setBoard(board)  
-        setShow(false);  
+        setBody("")
         if(player === 1){ 
             const playerTemp = 2
             const botTemp = 1
@@ -108,7 +112,7 @@ export default function GamePage(props){
     }
 
     const makeMove = function(board, column, row, player){
-        if(!show){
+        if(body==""){
         const temp = JSON.parse(JSON.stringify(board))
         temp[row][column] = player
         setBoard(temp)
@@ -141,10 +145,8 @@ export default function GamePage(props){
             const boardTemp = data.board
             setBoard(boardTemp)
             if(winningConditions(boardTemp, bot)){
-                setShow(true)
                 setBody("Unfortunately, computer won! Try once again")
             }else if(drawCondition(boardTemp)){
-                setShow(true)
                 setBody("Draw, but it was good game!")
             }
           };
@@ -155,16 +157,16 @@ export default function GamePage(props){
 
 
     const sendData = function(event){ 
+        if(body==""){
             var column = event.target.value % 7;
             var temp = playerMove(board, column, player)
             setBoard(temp)
             if(winningConditions(temp, player)){
                 setBody("Congratulations, you won!")
-                setShow(true)
             }else if(drawCondition(board)){
-                setShow(true)
                 setBody("Draw, but it was good game!")
             }
+        }
     };
 
 
@@ -192,46 +194,89 @@ export default function GamePage(props){
     }
 
 
-    return (
-        <Grid container spacing={1} align="center">
+    return (<div style={classes.root}>
+        <Grid container spacing={2} align="center">
             <Grid item xs={12}>
+                <Typography component="h3" variant="h3">
+                        Connect 4 
+                </Typography>
+            </Grid>
+            
+                <Grid item xs={12}>
+                    <div className="board">
+                        {[...new Array(ROWS)].map((x, rowIndex) => {
+                            return (
+                            <div className="board-row" key={rowIndex}>
+                                {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
+                            </div>  
+                            )
+                        })
+                        }
+                        <h1>{body}</h1>
+                    </div>
+                    
+                </Grid>
+                <Grid container spacing={2} justifyContent='space-between'>
+                <Grid item xs={12}>
+                    <Button style={{marginRight: 20, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
+                    <Button style={{marginLeft: 40, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>         
+                </Grid>
+            
+            <Grid item xs={12}>           
+                <Button style={{marginRight: 20, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
+                <Button style={{marginLeft: 40, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
+            </Grid> 
+            </Grid>
+
+            
+            {/* <Grid container spacing={6} direction="column" justifyContent="space-between" alignItems="center" style={{ background: '#777'}}>
+            <Grid item xs={1}>
+            <Typography component="h3" variant="h3">
+                    Connect 4 
+            </Typography>
+            </Grid>
+            <Grid item xs="auto">
+            <Grid container spacing={6} direction="row" justifyContent="space-between" alignItems="center" style={{ background: '#555'}}>
+            
+            <Grid item xs={8}>
                 <div className="board">
                     {[...new Array(ROWS)].map((x, rowIndex) => {
                         return (
                         <div className="board-row" key={rowIndex}>
                             {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
-                        </div>
-                        
-                        
+                        </div>  
                         )
                     })
                     }
                 </div>
+                {body}
             </Grid>
-            
-        <Grid item xs={12}>
+            <Grid item xs={4}>
+                    <Button color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
+                    <Button color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
+            </Grid>
+            </Grid>
+            </Grid>
+            <Grid item xs={2}>
+            <Grid item xs={12}>
             <Button color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>
         </Grid>
         <Grid item xs={12}>
             <Button color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
         </Grid>
+            </Grid>
+            </Grid> */}
+            
+            
         
-            <Modal show={show} onHide={startNewGame} backdrop="static" keyboard={false} centered>
-                <Modal.Header>
-                    <Modal.Title>Game Ended</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {body}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
-                    <Button color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
-                </Modal.Footer>
-            </Modal>
+        
+            
         
             
         </Grid>
+        </div>
         
         )
+        
 }
 
