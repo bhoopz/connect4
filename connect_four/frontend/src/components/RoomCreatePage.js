@@ -26,7 +26,12 @@ export default function RoomCreatePage(props) {
           width: 200,
           marginTop:10,
         },
-      });
+        center: {
+            position: 'absolute',
+            top: '45%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+      }});
     const classes = useStyles();
     
 
@@ -69,7 +74,7 @@ export default function RoomCreatePage(props) {
 
     
 
-    return (<Grid container spacing={1} align="center">
+    return (<Grid className={classes.center} container spacing={1} align="center">
         <Grid item xs={12}>
             <Typography component="h4" variant="h4">
                 Create a Room
@@ -112,10 +117,10 @@ export default function RoomCreatePage(props) {
                               
         </Grid>
         <Grid item xs={12} >
-            <Button color="primary" variant="contained" onClick={handleButtonClick}>Create a Room</Button>
+            <Button style={{width: 150, borderRadius: 15}} color="primary" variant="contained" onClick={handleButtonClick}>Create a Room</Button>
         </Grid>
         <Grid item xs={12} >
-            <Button color="secondary" variant="contained" to="/player" component={Link}>Back</Button>
+            <Button style={{width: 150}} color="secondary" variant="contained" to="/player" component={Link}>Back</Button>
         </Grid>
         
         

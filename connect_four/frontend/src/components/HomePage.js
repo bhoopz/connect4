@@ -29,6 +29,8 @@ export default function HomePage(props) {
     let history = useHistory();
     const [data, setData] = useState([]);
     const classes = useStyles()
+    
+    
 
     async function fetchMyAPI() {
         let response = await fetch('/player/room')
@@ -71,10 +73,14 @@ export default function HomePage(props) {
 
 
     const generateHomePage = () => {
-        return (<Grid container spacing={2} align="center">
+        return (<Grid container spacing={1} align="center">
             <Grid item xs={12}>
             <Typography component="h3" variant="h3">
-                Connect 4
+                Connect 4 
+            </Typography>
+            &nbsp;
+            <Typography component="h5" variant="h5">
+                Live rooms
             </Typography>
             
 
@@ -90,12 +96,16 @@ export default function HomePage(props) {
 })}
 </div>
             
-        </Grid>      
+        </Grid>  
+           
         <Grid item xs={12}>
-        <Button color="primary" variant="contained" to="/player/" component={Link} >PLAYER</Button>
+        <Typography component="h5" variant="h5">
+                Play against
+        </Typography> 
+        <Button color="primary" style={{width: '150px'}} variant="contained" to="/player/" component={Link} >PLAYER</Button>
         </Grid>
         <Grid item xs={12}>
-        <Button color="secondary" variant="contained" to="/computer/" component={Link}>COMPUTER</Button>
+        <Button color="secondary" style={{width: '150px'}} variant="contained" to="/computer/" component={Link}>COMPUTER</Button>
         </Grid>
         </Grid>)
     }

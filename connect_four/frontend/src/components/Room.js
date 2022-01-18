@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import { useEffect, useMemo } from "react";
 import { render } from "react-dom";
-import { useParams, useHistory, Redirect } from "react-router-dom";
+import { useParams, useHistory, Redirect, Link } from "react-router-dom";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -9,7 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Prompt } from 'react-router';
-
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 
 
@@ -41,15 +41,16 @@ export default function Room(props) {
     var [playerNickname, setPlayerNickname] = useState("")
     var [whoWonString, setWhoWonString] = useState("");
     const [ifPublic, setIfPublic] = useState(false)
-  
+
 
     if(!history.location.state || !history.location.state.nick){
-        return <Redirect to ="/player/join/" />
+        return <Redirect to ="/player/join" />
     }
-
     window.onbeforeunload = function(){
-      userLeftPage();
+        userLeftPage();
   };
+
+  
 
     const userLeftPage = () =>{
       if(isHost===false){
@@ -67,6 +68,7 @@ export default function Room(props) {
                   host_seconds : tempSeconds,
                   player_time : tempTime,
                   player_seconds : tempSeconds,
+                  player_score: 0,
                 }))
                 const requestOptions= {
                   method: 'POST',
@@ -144,14 +146,17 @@ export default function Room(props) {
       ,[])
 
       roomSocket.onclose = function (e) {
-        userLeftPage();
         console.error("Chat socket closed");
       };
 
       
+
       const sendMsg = function(){ 
+
         document.querySelector("#chat-message-submit").onclick = function (e) {
+          
             const messageInputDom = document.querySelector("#chat-message-input");
+            
             const message = messageInputDom.value;
             if(message != ""){
                 roomSocket.send(
@@ -637,22 +642,94 @@ const makeMoveButtonClick = function(event){
       fetch("/player/get-room", requestOptions).then((response) =>{response})
   }
 
+  const classes = {
+    root: {
+      flexGrow: 1
+    }};
+
+    function openForm() {
+      document.getElementById("chat").style.display = "block";
+      document.getElementById("chat").style.width = "100%";
+      document.getElementById("cancel").style.display = "block";
+    }
+
+    function closeForm() {
+      document.getElementById("chat").style.display = "none";
+    }
+
 
     return (
-            <div id="container">
-              <Grid container spacing={6} direction="column" justifyContent="center" alignItems="center">   
-                <Grid item xs={4}>
+            <div style={classes.root}>
+              <Grid container spacing={2} align="center">   
+                <Grid item xs={12}>
                   <Typography component="h3" variant="h3">
                     Connect 4 
-                  </Typography>
-                  
+                  </Typography>    
                 </Grid>
+                <Grid item xs={12} lg={3}>
+                
+                  <div className="content-to-hide" id="chat">
+                  <Typography component="h6" variant="h6">
+                    Chat
+                  </Typography> 
+                  <form className="form-container" >
+                    <textarea readOnly="readOnly" id="chat-log" cols="30" rows="20"></textarea><br />
+                    <input id="chat-message-input" 
+                    onKeyPress={(ev) => {
+                      if (ev.key === "Enter") {
+                        ev.preventDefault();
+                        document.querySelector("#chat-message-submit").click();
+                      }
+                    }}
+                     type="text" />
+                    <input id="chat-message-submit" className="send-button" type="button" value="〉" />
+                    <button type="button" className="btn cancel" id='cancel' onClick={closeForm}>Close</button>
+                    </form>
+                  </div>
+                  
+
+                </Grid>
+                <Grid item xs={12} lg={6}>
+                  <div className="board">
+                    {[...new Array(ROWS)].map((x, rowIndex) => {
+                      return (
+                        <div className="board-row" key={rowIndex}>
+                            {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
+                        </div>)
+                      })}
+                      <h2>{whoWonString != "" ? whoWonString : whoseMoveString}</h2> 
+                  </div> 
+                </Grid>
+                <Grid item xs={12} lg={3} style={{ background: 'rgb(255, 213, 97)', borderRadius:'5%', fontSize: 'min(max(10px, 2vw), 10px)'}}>
+                <div className="parent">
+                  <div className='host-div'>
+                  <Typography component="h5" variant="h5">
+                  {hostScore}&nbsp;&nbsp;&nbsp;{hostNickname}
+                  {showTime(hostTime, hostSeconds)}
+                  {isHost==true ? <Button color="primary" className="new-game-button" variant="contained"  onClick={startNewGame} disabled={whoWonString==""}>New game</Button> : null}
+                  </Typography> 
+                    
+                    
+                  </div>
+                  
+                  <button className="open-button" onClick={openForm}>💬</button>
+                  
+                  <div className='player-div'>
+                  <Typography component="h5" variant="h5">
+                  {playerScore}&nbsp;&nbsp;&nbsp;{playerNickname}
+                  {showTime(playerTime, playerSeconds)}
+                  
+                  </Typography> 
+                  </div>
+                  </div>
+                </Grid>
+
                 
         
-              <Grid item xs="auto">
+              {/* <Grid item xs="auto">
                   <div id="content">
-                    <Grid container spacing={6} direction="row" justifyContent="space-between" alignItems="center" style={{ background: '#555'}}>
-                        <Grid item xs style={{ background: '#999'}}>
+                    <Grid container spacing={6} direction="row" justifyContent="space-between" alignItems="center" style={{ background: 'white'}}>
+                        <Grid item xs style={{ background: 'black'}}>
                             <textarea readOnly="readOnly" id="chat-log" cols="30" rows="20"></textarea><br />
                             <input id="chat-message-input" type="text" size="31" /><br />
                             <input id="chat-message-submit" type="button" value="Send" />
@@ -688,7 +765,7 @@ const makeMoveButtonClick = function(event){
                         
                     </Grid>        
                   </div>
-              </Grid>
+              </Grid> */}
 
               <Dialog
                 open={open}
@@ -717,16 +794,15 @@ const makeMoveButtonClick = function(event){
                 <DialogContent>
                 <DialogContentText id="alert-dialog-description" textAlign="center">
                   {ifPublic==false ? (<Typography component={'span'} variant="h3">Your room code:<br></br></Typography>) : null}
-                  {ifPublic==false ? (<Typography component={'span'} variant="h2"><b>{roomCode}</b></Typography>) : null}
-                 
-                
+                  {ifPublic==false ? (<Typography component={'span'} variant="h2"><b>{roomCode}<br></br></b></Typography>) : null}
+                  <Button style={{width: 150}} onClick={userLeftPage} color="secondary" variant="contained" to="/" component={Link}>CANCEL</Button>
                 </DialogContentText>
+                
               </DialogContent>
               </Dialog>
 
-              <Grid item xs={2}>
-                <p>{isHost.toString()}</p>
-                <Button color="secondary" variant="contained" onClick={userLeftPage}>Leave the Game</Button>
+              <Grid item xs={12}>
+                <Button color="secondary" variant="contained" onClick={userLeftPage} to="/" component={Link}>Leave the Game</Button>
               </Grid>
       </Grid>
   </div>);

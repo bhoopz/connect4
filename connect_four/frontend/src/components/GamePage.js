@@ -19,6 +19,7 @@ export default function GamePage(props){
     const ROWS = 6
     const COLUMNS = 7
     const [squares, setSquares] = useState(Array(ROWS*COLUMNS))
+    const [playerTurn, setPlayerTurn] = useState(true)
 
     const gameSocket =useMemo(()=> new WebSocket(
         "ws://" + window.location.host + "/ws" + props.location.pathname + "/"
@@ -107,15 +108,13 @@ export default function GamePage(props){
         }
     }
 
-    const correctRow = function(board, column){
-        return board[5][column]
-    }
 
     const makeMove = function(board, column, row, player){
         if(body==""){
         const temp = JSON.parse(JSON.stringify(board))
         temp[row][column] = player
         setBoard(temp)
+        setPlayerTurn(false)
         gameSocket.send(
             JSON.stringify({
               board: temp,
@@ -144,6 +143,7 @@ export default function GamePage(props){
             const data = JSON.parse(e.data);
             const boardTemp = data.board
             setBoard(boardTemp)
+            setPlayerTurn(true)
             if(winningConditions(boardTemp, bot)){
                 setBody("Unfortunately, computer won! Try once again")
             }else if(drawCondition(boardTemp)){
@@ -157,7 +157,7 @@ export default function GamePage(props){
 
 
     const sendData = function(event){ 
-        if(body==""){
+        if(body=="" && playerTurn==true){
             var column = event.target.value % 7;
             var temp = playerMove(board, column, player)
             setBoard(temp)
@@ -218,13 +218,13 @@ export default function GamePage(props){
                 </Grid>
                 <Grid container spacing={2} justifyContent='space-between'>
                 <Grid item xs={12}>
-                    <Button style={{marginRight: 20, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
-                    <Button style={{marginLeft: 40, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>         
+                    <Button style={{marginRight: 20, borderRadius: 15, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
+                    <Button style={{marginLeft: 40, borderRadius: 15, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(10px, 2vw), 16px)"}} color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>         
                 </Grid>
             
             <Grid item xs={12}>           
-                <Button style={{marginRight: 20, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
-                <Button style={{marginLeft: 40, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
+                <Button style={{marginRight: 20, borderRadius: 15, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
+                <Button style={{marginLeft: 40, borderRadius: 15, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
             </Grid> 
             </Grid>
 

@@ -1,10 +1,21 @@
 import React from "react";
-import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
+import {Grid, TextField, Typography, Button, FormControl, FormHelperText, makeStyles} from "@material-ui/core"
 import { Link } from "react-router-dom";
 import Room from "./Room";
 import { useParams, useHistory } from "react-router-dom";
 
 export default function RoomJoinPage(props) {
+
+    const useStyles = makeStyles({
+        root: {
+          position: 'absolute',
+          top: '45%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }})
+
+    const classes = useStyles()
+
     let history = useHistory();
     const [roomCode, setRoomCode] = React.useState("");
     const [error, setError] = React.useState("");
@@ -38,7 +49,7 @@ export default function RoomJoinPage(props) {
 
     
     return (
-    <Grid container spacing={1} align="center">
+    <Grid className={classes.root} container spacing={1} align="center">
         <Grid item xs={12}>
             <Typography component="h4" variant="h4">
                 Join the Room
@@ -72,10 +83,10 @@ export default function RoomJoinPage(props) {
                 </FormControl>
                 </Grid>
                 <Grid item xs={12} >
-            <Button color="primary" variant="contained" onClick={handleJoinRoomButtonClick}>Join the Room</Button>
+            <Button style={{width: 150, borderRadius: 15}} color="primary" variant="contained" onClick={handleJoinRoomButtonClick}>Join the Room</Button>
         </Grid>
         <Grid item xs={12} >
-            <Button color="secondary" variant="contained" to="/player/" component={Link}>Back</Button>
+            <Button style={{width: 150}} color="secondary" variant="contained" to="/player/" component={Link}>Back</Button>
         </Grid>
 
         
