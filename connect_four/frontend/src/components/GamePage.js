@@ -21,7 +21,7 @@ export default function GamePage(props){
     const [squares, setSquares] = useState(Array(ROWS*COLUMNS))
     const [playerTurn, setPlayerTurn] = useState(true)
 
-    const gameSocket =useMemo(()=> new WebSocket(
+    const gameSocket = useMemo(()=> new WebSocket(
         "ws://" + window.location.host + "/ws" + props.location.pathname + "/"
       )
       ,[])
@@ -115,6 +115,7 @@ export default function GamePage(props){
         temp[row][column] = player
         setBoard(temp)
         setPlayerTurn(false)
+        if(!winningConditions(temp, player)){
         gameSocket.send(
             JSON.stringify({
               board: temp,
@@ -123,6 +124,7 @@ export default function GamePage(props){
               bot: bot,
             })
           );
+        }
           return temp
         }
     }

@@ -89,7 +89,7 @@ export default function HomePage(props) {
             return (item.public==true && item.player_id==null ?
                 
             <Grid item xs={12} key={i}> 
-                <Button className={classes.button}  variant="contained" disabled={item.player_id!=null} onClick={() => handleJoinRoomButtonClick(item.code)} key={i}>{item.host_nickname} - {item.game_time=="00:00:00" ? "None" : item.game_time.split('00:')[1]}</Button>
+                <Button className={classes.button}  variant="contained" disabled={item.player_id!=null} onClick={() => handleJoinRoomButtonClick(item.code)} key={i}>{item.host_nickname} - {item.game_time=="00:00:00" ? "No time" : item.game_time.split('00:')[1]}</Button>
             </Grid>
             
             : null)

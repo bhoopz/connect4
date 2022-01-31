@@ -38,7 +38,6 @@ export default function RoomJoinPage(props) {
             })
         };
         fetch("/player/join-room", requestOptions).then((response) => {
-            console.log(response)
             if(response.ok){
                 history.push({pathname:`/player/room/${roomCode}`, state:{nick}})
             }else{
