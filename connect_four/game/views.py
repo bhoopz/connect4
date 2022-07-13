@@ -39,7 +39,6 @@ class GetRoom(APIView):
         queryset = Room.objects.filter(code=code)
         if queryset.exists():
             room = queryset[0]
-            print(request.data)
             if 'board' in request.data:
                 board = request.data['board']
                 room.board = board
@@ -133,35 +132,6 @@ class RoomCreateView(APIView):
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-""" class GameView(generics.ListCreateAPIView):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
-
-
-class GameCreateView(APIView):
-    serializer_class = GameCreateSerializer
-
-    def post(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            bot_level = serializer.data.get('bot_level')
-            host = self.request.session.session_key
-            queryset = Game.objects.filter(host=host)
-            if queryset.exists():
-                game = queryset[0]
-                game.bot_level = bot_level
-                game.save(update_fields=['bot_level'])
-                return Response(GameSerializer(game).data, status=status.HTTP_200_OK)
-            else:
-                game = Game(host=host, bot_level=bot_level)
-                game.save()
-            return Response(GameSerializer(game).data, status=status.HTTP_201_CREATED)
-        return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST) """
-
-
 class LeaveRoom(APIView):
     def post(self, request, format=None):
         host = self.request.session.session_key
@@ -170,28 +140,3 @@ class LeaveRoom(APIView):
             room = finded_room[0]
             room.delete()
         return Response(status=status.HTTP_200_OK)
-
-
-""" class Test(APIView):
-    queryset = Game.objects.all()
-    serializer_class = GameSerializer
-
-    def get(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-        data = {
-            'board': request.GET.get('board')
-        }
-        return Response(data, status=status.HTTP_200_OK)
-
-    def post(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-
-        try:
-            column = int(request.data['column'])
-            data = main(column)
-            print(data)
-            return Response(data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST) """

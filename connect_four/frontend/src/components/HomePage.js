@@ -42,12 +42,12 @@ export default function HomePage(props) {
         fetchMyAPI()
       }, [])
 
-    //   useEffect(() => {
-    //     const interval = setInterval(() => {
-    //       fetchMyAPI()
-    //     }, 1000);
-    //     return () => clearInterval(interval);
-    //   }, []);
+      useEffect(() => {
+        const interval = setInterval(() => {
+          fetchMyAPI()
+        }, 5000);
+        return () => clearInterval(interval);
+      }, []);
 
       
 

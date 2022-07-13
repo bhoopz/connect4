@@ -9,6 +9,4 @@ urlpatterns = [
     path('player/', index),
     path('computer/', index),
     path('computer/<str:level>', index),
-    #path('computer/medium', index),
-    #path('computer/hard', index),
 ]

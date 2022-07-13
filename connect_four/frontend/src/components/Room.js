@@ -350,36 +350,6 @@ export default function Room(props) {
               };
         });
 
-// useEffect(()=>{
-//   return ()=>{
-//     if(isHost===false){
-//       roomSocket.send(
-//         JSON.stringify({
-//           player_id: "",
-//         }))
-//         const requestOptions= {
-//           method: 'POST',
-//           headers: { 'Content-Type': 'application/json'},
-//           body: JSON.stringify({ 
-//               player_id: null,
-//               board: defaultBoard,
-//               code: roomCode,
-//           })
-//       };
-//       fetch("/player/get-room", requestOptions).then((response) =>{response})
-//     }else{
-//       roomSocket.send(
-//         JSON.stringify({
-//           who_won_string: "Host left, room expired",
-//         }))
-//         const requestOptions = {
-//           method: "POST",
-//           headers: { "Content-Type": "application/json" },
-//         };
-//         fetch("/player/leave-room", requestOptions).then((response) => props.history.push("/"))
-//     }
-//   }
-// },[])
 
       function changeTimeString(xMinutes, xSeconds){
         if(xMinutes < 10){
@@ -724,48 +694,6 @@ const makeMoveButtonClick = function(event){
                   </div>
                 </Grid>
 
-                
-        
-              {/* <Grid item xs="auto">
-                  <div id="content">
-                    <Grid container spacing={6} direction="row" justifyContent="space-between" alignItems="center" style={{ background: 'white'}}>
-                        <Grid item xs style={{ background: 'black'}}>
-                            <textarea readOnly="readOnly" id="chat-log" cols="30" rows="20"></textarea><br />
-                            <input id="chat-message-input" type="text" size="31" /><br />
-                            <input id="chat-message-submit" type="button" value="Send" />
-                        </Grid>
-                        <Grid item xs={6} style={{ alignItems: 'center' }}>
-                          <div className="board">
-                              {[...new Array(ROWS)].map((x, rowIndex) => {
-                                return (
-                                  <div className="board-row" key={rowIndex}>
-                                      {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
-                                  </div>)
-                                })}
-                                <h2>{whoWonString != "" ? whoWonString : whoseMoveString}</h2> 
-                          </div> 
-                            
-                        </Grid>
-                        <Grid container item xs spacing={6} direction="column" justifyContent="center" style={{ background: '#000'}}>  
-                        <Grid item xs={4} style={{ background: '#333'}}>
-                              {hostNickname}
-                              <h1>{hostScore}</h1>
-                        </Grid> 
-                        <Grid item xs={4} style={{ background: '#999'}}>
-                          {showTime(hostTime, hostSeconds)}
-                          {showTime(playerTime, playerSeconds)}
-                          {isHost==true ? <Button color="primary" variant="contained"  onClick={startNewGame} disabled={whoWonString==""}>New game</Button> : null}
-                        </Grid>  
-                        <Grid item xs={4} style={{ background: '#333'}}>
-                              {playerNickname}
-                              <h1>{playerScore}</h1>
-                        </Grid> 
-                  
-                        </Grid>
-                        
-                    </Grid>        
-                  </div>
-              </Grid> */}
 
               <Dialog
                 open={open}

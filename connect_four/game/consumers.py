@@ -27,7 +27,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    # Tutorial how to not use Websockets BloodTrail
     # Otrzymuje wiadomość od WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -67,9 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             player_time = text_data_json['player_time']
         if 'player_seconds' in text_data_json:
             player_seconds = text_data_json['player_seconds']
-        print(text_data_json, "to dostaje ")
 
-        # Wysyła wiadomość do grupy
         if message != None and nick != None:
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -151,13 +148,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-    # Otrzymuje wiadomość od grupy
-
     async def chat_message(self, event):
         message = event['message']
         nick = event['nick']
 
-        # Wysyła wiadomość do WebSocket
         if message != None and nick != None:
             await self.send(text_data=json.dumps({
                 'message': message,
@@ -167,7 +161,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def room_data(self, event):
         board = event['board']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'board': board,
         }))
@@ -175,7 +168,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def send_decision(self, event):
         decision = event['decision']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'decision': decision,
         }))
@@ -183,7 +175,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def player_info(self, event):
         player_id = event['player_id']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'player_id': player_id,
         }))
@@ -191,7 +182,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def who_won(self, event):
         who_won_string = event['who_won_string']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'who_won_string': who_won_string,
         }))
@@ -199,7 +189,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def send_player_score(self, event):
         player_score = event['player_score']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'player_score': player_score,
         }))
@@ -207,7 +196,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def send_host_score(self, event):
         host_score = event['host_score']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'host_score': host_score,
         }))
@@ -216,7 +204,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         host_time = event['host_time']
         host_seconds = event['host_seconds']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'host_time': host_time,
             'host_seconds': host_seconds,
@@ -226,7 +213,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         player_time = event['player_time']
         player_seconds = event['player_seconds']
 
-        # Wysyła wiadomość do WebSocket
         await self.send(text_data=json.dumps({
             'player_time': player_time,
             'player_seconds': player_seconds,

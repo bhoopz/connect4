@@ -197,7 +197,6 @@ class Game(models.Model):
                 board[row][column] = bot
                 score = self.minimax(
                     board, depth, False, -math.inf, math.inf, player, bot, BOT_LEVEL)
-                print(score, column)
                 board[row][column] = 0
                 if(score >= best_score):
                     best_score = score

@@ -229,51 +229,6 @@ export default function GamePage(props){
                 <Button style={{marginLeft: 40, borderRadius: 15, maxWidth: 300, minWidth: 150, width: "25%", fontSize: "min(max(8px, 2vw), 16px)"}} color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
             </Grid> 
             </Grid>
-
-            
-            {/* <Grid container spacing={6} direction="column" justifyContent="space-between" alignItems="center" style={{ background: '#777'}}>
-            <Grid item xs={1}>
-            <Typography component="h3" variant="h3">
-                    Connect 4 
-            </Typography>
-            </Grid>
-            <Grid item xs="auto">
-            <Grid container spacing={6} direction="row" justifyContent="space-between" alignItems="center" style={{ background: '#555'}}>
-            
-            <Grid item xs={8}>
-                <div className="board">
-                    {[...new Array(ROWS)].map((x, rowIndex) => {
-                        return (
-                        <div className="board-row" key={rowIndex}>
-                            {[...new Array(COLUMNS)].map((y, colIndex) => renderSquare(rowIndex*COLUMNS + colIndex) )}
-                        </div>  
-                        )
-                    })
-                    }
-                </div>
-                {body}
-            </Grid>
-            <Grid item xs={4}>
-                    <Button color="primary" variant="contained" onClick={startNewGame}>New Game</Button>
-                    <Button color="secondary" variant="contained" to="/computer/" component={Link}>Change Computer Level</Button>
-            </Grid>
-            </Grid>
-            </Grid>
-            <Grid item xs={2}>
-            <Grid item xs={12}>
-            <Button color="primary" variant="contained" onClick={changeOrder}>Switch Move Order</Button>
-        </Grid>
-        <Grid item xs={12}>
-            <Button color="secondary" variant="contained" to="/" component={Link}>Leave the Game</Button>
-        </Grid>
-            </Grid>
-            </Grid> */}
-            
-            
-        
-        
-            
-        
             
         </Grid>
         </div>
