@@ -6,6 +6,7 @@ Functionalities:
 - ability to play with a time limit (per player)
 - game chat
 - playing with computer at three levels of difficulty based on minimax algorithm with alpha beta pruning
+- and more
 
 
 <p align="center"
@@ -18,6 +19,12 @@ Functionalities:
 <p align="center"
 
 ![image](https://user-images.githubusercontent.com/45632667/178720289-6133f550-2114-4adb-a2c6-c7af62efa5df.png)
+
+</p>
+
+<p align="center"
+
+![image](https://user-images.githubusercontent.com/45632667/178724139-f3f0b448-6045-44a0-b3c6-d3b9d5e56217.png)
 
 </p>
 
