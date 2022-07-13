@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from "react";
-import { render } from "react-dom";
 import RoomJoinPage from "./RoomJoinPage";
 import RoomCreatePage from "./RoomCreatePage"
 import Room from "./Room"
 import PlayerPage from "./PlayerPage"
 import ComputerPage from "./ComputerPage"
 import GamePage from "./GamePage"
-import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory } from "react-router-dom";
-import {Grid, TextField, Typography, Button, FormControl, FormHelperText, makeStyles} from "@material-ui/core"
+import { Switch, Route, Link, useHistory } from "react-router-dom";
+import { Grid, Typography, Button, makeStyles } from "@material-ui/core"
 
 
 const useStyles = makeStyles({

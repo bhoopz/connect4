@@ -1,9 +1,6 @@
 import json
-from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import *
-import asyncio
-import sys
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -12,7 +9,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_code = self.scope['url_route']['kwargs']['roomCode']
         self.room_group_name = 'chat_%s' % self.room_code
 
-        # Dołącza do grupy
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -21,13 +17,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        # Opuszcza grupe
+
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-    # Otrzymuje wiadomość od WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = None

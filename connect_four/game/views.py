@@ -1,13 +1,10 @@
-from django.shortcuts import render
 from rest_framework import generics, status
 from .serializers import *
 from .models import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
-import numpy as np
 import uuid
-import asyncio
 
 
 # Create your views here.

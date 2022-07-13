@@ -1,21 +1,15 @@
 import React, {useState} from "react";
 import { useEffect, useMemo } from "react";
-import { render } from "react-dom";
 import { useParams, useHistory, Redirect, Link } from "react-router-dom";
-import {Grid, TextField, Typography, Button, FormControl, FormHelperText} from "@material-ui/core"
+import { Grid, Typography, Button } from "@material-ui/core"
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { Prompt } from 'react-router';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
 
 
 export default function Room(props) {
-
-  
   
     let params = useParams();
     let history = useHistory();
@@ -420,9 +414,6 @@ export default function Room(props) {
     }
 }
 
-const correctRow = function(board, column){
-    return board[5][column]
-}
 
 const makeMove = function(board, column, row, player){
     const temp = JSON.parse(JSON.stringify(board))

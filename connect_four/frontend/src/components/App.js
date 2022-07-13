@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
 import HomePage from "./HomePage";
-import RoomJoinPage from "./RoomJoinPage";
-import RoomCreatePage from "./RoomCreatePage"
-import { BrowserRouter as Router, Switch, Route, Link, Redirect, useHistory } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 function App(props) {
     return (<Router>
         <div className="center">

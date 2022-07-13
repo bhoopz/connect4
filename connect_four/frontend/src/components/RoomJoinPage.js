@@ -1,8 +1,7 @@
 import React from "react";
 import {Grid, TextField, Typography, Button, FormControl, FormHelperText, makeStyles} from "@material-ui/core"
 import { Link } from "react-router-dom";
-import Room from "./Room";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 export default function RoomJoinPage(props) {
 

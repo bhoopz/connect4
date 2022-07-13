@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Grid, Typography, TextField, FormHelperText, FormControl, Radio, RadioGroup, FormControlLabel, Slider, makeStyles, Checkbox } from "@material-ui/core"
-import Select from 'react-select'
+
 
 export default function RoomCreatePage(props) {
     let [value, setValue] = React.useState(5);
